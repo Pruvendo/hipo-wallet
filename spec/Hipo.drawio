@@ -1,0 +1,28 @@
+<mxfile host="Electron" modified="2024-05-23T00:28:57.617Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="pTwsL_TdZVEphZ91mZlT" version="24.4.0" type="device">
+  <diagram name="Page-1" id="vYP6Qsh6CQKszZ2pHyyj">
+    <mxGraphModel dx="994" dy="731" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gtyeEEDZM4Qz8L5JC97O-1" value="&lt;h1 style=&quot;text-align: center; margin-top: 0px;&quot;&gt;Welcome to HipoFinance formal specification!!!&lt;/h1&gt;&lt;p&gt;Please note that all the green elemens are clickable&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="170" y="180" width="670" height="70" as="geometry" />
+        </mxCell>
+        <UserObject label="Approach description" link="https://docs.google.com/document/d/1Jz4NCMcs1w-7aTQHRtgkYKnLJRPGSG2aydrnPtWPNtg/edit?usp=sharing" id="gtyeEEDZM4Qz8L5JC97O-3">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+            <mxGeometry x="173" y="300" width="120" height="60" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Business-level specification" link="https://docs.google.com/document/d/12mwVK46EzK0M8ZJ-arr3AZszrw_IojdwD4kUGAc3OoI/edit?usp=sharing" id="gtyeEEDZM4Qz8L5JC97O-4">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+            <mxGeometry x="383" y="300" width="120" height="60" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="High-level specification" link="./BaseScenario.html" id="gtyeEEDZM4Qz8L5JC97O-5">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+            <mxGeometry x="593" y="300" width="120" height="60" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
