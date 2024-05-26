@@ -911,38 +911,283 @@ return .
 Defined.
 Sync.
 
-() on_bounce(slice src, slice s) impure inline {
-    ;; this should not happen but in a rare case of a bounce (e.g. a frozen account), at least recover tokens
+Ursus Definition on_bounce(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+   (*  ;; this should not happen but in a rare case of a bounce (e.g. a frozen account), at least recover tokens *)
+    (* s~load_uint(32); *)
+    ::// var0 xxx:_ := s -> load(int256 (* 32 *));_| .
+    (* int op = s~load_uint(32); *)
+    ::// var0 op:_ := s -> load(int256 (* 32 *));_| .
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
 
-    s~load_uint(32);
-    int op = s~load_uint(32);
-    int query_id = s~load_uint(64);
-
-    if op == op::receive_tokens {
-        int amount = s~load_coins();
-        tokens += amount;
+    ::// if(op == {} (* op::receive_tokens *)) then { ->/> } .
+    {
+        (* int amount = s~load_coins(); *)
+       ::// var0 amount:_ := s -> load(int256);_ | .
+       ::// tokens += amount | .
     }
 
-    if op == op::proxy_reserve_tokens {
-        int amount = s~load_coins();
-        tokens += amount;
-        unstaking -= amount;
+    ::// if(op == {} (* op::proxy_reserve_tokens *) ) then { ->/> } .
+     {   (* int amount = s~load_coins(); *)
+       ::// var0 amount:_ := s -> load(int256);_ | .
+        (* tokens += amount; *)
+       ::// tokens += amount .
+       ::// unstaking -= amount | .
     }
 
-    if op == op::proxy_migrate_wallet {
-        int amount = s~load_coins();
-        tokens += amount;
+    ::// if(op == {} (* op::proxy_migrate_wallet *)) then { ->/> } .
+    {   (*  int amount = s~load_coins(); *)
+       ::// var0 amount:_ := s -> load(int256);_ | .
+        (* tokens += amount; *)
+       ::// tokens += amount | .
     }
 
-    if op == op::send_tokens {
-        ;; do nothing
+    ::// if(op == {} (* op::send_tokens *)) then { ->> } .
+    {
+       (* ;; do nothing *)
+       ::// tokens := tokens | .
     }
 
-    ;; send back excess gas to owner which is usually the original sender
-    builder excess = begin_cell()
-        .store_uint(op::gas_excess, 32)
-        .store_uint(query_id, 64);
-    send_msg(false, owner.to_builder(), null(), excess, 0, send::remaining_value + send::ignore_errors);
+   (*  ;; send back excess gas to owner which is usually the original sender *)
+   (*  builder excess = begin_cell() *)
+    ::// var0 excess : TvmBuilder ; _ |.
+        (* .store_uint(op::gas_excess, 32) *)
+    ::// excess -> store ({} (* op::gas_excess, 32 *)) .
+        (* .store_uint(query_id, 64); *)
+    ::// excess -> store (query_id (* 64 *)) .
+    (* send_msg(false, owner.to_builder(), null(), excess, 0, send::remaining_value + send::ignore_errors); *)
+refine __return__.
 }
+return .
+Defined.
+Sync.
+
+Ursus Definition skip_bits(x:int256):UExpression PhantomType false.
+{ 
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+Ursus Definition get_original_fwd_fee(x:slice_)(y:bool):UExpression int256 false.
+{ 
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+
+Ursus Definition route_internal_message(flags:int256)(src:slice_)(s:slice_)(cs:slice_):UExpression PhantomType true.
+{
+    (* if flags & 1 { *)
+    ::// if(flags(*  & 1 *)) then { ->/> } . (* ???????????????????? *)
+    {    (* return on_bounce(src, s); *)
+        ::// exit_ (on_bounce(src, s)) | .
+    }
+
+    (* int op = s~load_uint(32); *)
+    ::// var0 op :_ := s -> load(int256 (* 32 *));_| .
+
+    ::// if(op == {} (* op::send_tokens *) ) then { ->/> } .
+     {   (* cs~load_msg_addr(); ;; skip dst *)
+        ::// var0 _address : address := s -> load (address) ; _ | .
+        ::// var0 _builder : TvmBuilder; _ |.
+        ::// _builder -> store (_address) ; _ |.
+        ::// var0 __address:_ := _builder -> toCell() -> toSlice () ; _ |.
+        (* cs~load_coins(); ;; skip value *)
+        ::// var0 x1:_ := s -> load(int256);_ | .
+        (* cs~skip_bits(1); ;; skip extracurrency collection *)
+        ::// (* cs~ *)skip_bits({}) .
+        (* cs~load_coins(); ;; skip ihr fee *)
+        ::// var0 x2:_ := s -> load(int256);_ | .
+        (* int fwd_fee = get_original_fwd_fee(cs~load_coins(), false); ;; use fwd_fee to estimate forward_payload cost *)
+        ::// var0 fwd_fee:_:= get_original_fwd_fee((* cs->load(int256) *) {} , {false});_| .
+        ::// send_tokens((* src *) {} , {} (* s *), {} (* fwd_fee *)) | .
+    }
+
+    (* if op == op::receive_tokens { *)
+    ::// if(op == {} (* (* op::send_tokens *) *) ) then { ->/> } .
+    {
+        ::// exit_ receive_tokens(src, s) | .
+    }
+
+    (* if op == op::tokens_minted {
+        return tokens_minted(src, s);
+    } *)
+    ::// if(op == {} (* (* op::tokens_minted *) *) ) then { ->/> } .
+    {
+        ::// exit_ tokens_minted(src, s) | .
+    }
+
+    (* if op == op::save_coins {
+        return save_coins(src, s);
+    } *)
+    ::// if(op == {} (* (* op::save_coins *) *) ) then { ->/> } .
+    {
+        ::// exit_ save_coins(src, s) | .
+    }
+
+    (* if op == op::unstake_tokens {
+        return unstake_tokens(src, s);
+    } *)
+    ::// if(op == {} (* (* op::unstake_tokens *) *) ) then { ->/> } .
+    {
+        ::// exit_ unstake_tokens(src, s) | .
+    }
+
+    (* if op == op::rollback_unstake {
+        return rollback_unstake(src, s);
+    } *)
+    ::// if(op == {} (* (* op::rollback_unstake *) *) ) then { ->/> } .
+    {
+        ::// exit_ rollback_unstake(src, s) | .
+    }
+
+    (* if op == op::tokens_burned {
+        return tokens_burned(src, s);
+    } *)
+    ::// if(op == {} (* (* op::tokens_burned *) *) ) then { ->/> } .
+    {
+        ::// exit_ tokens_burned(src, s) | .
+    }
+
+    (* if op == op::unstake_all {
+        return unstake_all(src, s);
+    } *)
+    ::// if(op == {} (* (* op::unstake_all *) *) ) then { ->/> } .
+    {
+        ::// exit_ unstake_all(src, s) | .
+    }
+
+    (* if op == op::upgrade_wallet {
+        return upgrade_wallet(src, s);
+    } *)
+    ::// if(op == {} (* (* op::upgrade_wallet *) *) ) then { ->/> } .
+    {
+        ::// exit_ upgrade_wallet(src, s) | .
+    }
+
+   (*  if op == op::merge_wallet {
+        return merge_wallet(src, s);
+    } *)
+    ::// if(op == {} (* (* op::merge_wallet *) *) ) then { ->/> } .
+    {
+        ::// exit_ merge_wallet(src, s) | .
+    }
+
+    (* if op == op::withdraw_surplus {
+        return withdraw_surplus(src, s);
+    } *)
+    ::// if(op == {} (* (* op::withdraw_surplus *) *) ) then { ->/> } .
+    {
+        ::// exit_ withdraw_surplus(src, s) | .
+    }
+
+    (* if op == op::withdraw_jettons {
+        return withdraw_jettons(src, s);
+    } *)
+    ::// if(op == {} (* (* op::withdraw_jettons *) *) ) then { ->/> } .
+    {
+        ::// exit_ withdraw_jettons(src, s) | .
+    }
+
+    (* if op == op::top_up {
+        throw(0); ;; top up TON balance, do nothing
+    } *)
+    ::// if(op == {} (* (* op::top_up *) *) ) then { ->> } .
+    {
+        ::// throw({0}) |. 
+    }
+
+    ::// if(op == {} (* {0} *)) then { ->/> } .
+    {  (* int c = s~load_uint(8); *)
+      ::// var0 c :_ := s -> load(int256 (* 8 *));_| .
+        (* s.end_parse(); *)
+       (*  c |= 0x20; ;; convert to lowercase *) (* ??????????????????????????? *)
+
+        ::// if(c == {} (* "w"u *) ) then { ->/> } .
+        {
+             ::// exit_ unstake_all(src, {} (* "0000000000000000"s *)) | .
+        }
+
+        ::// throw( {} (* err::invalid_comment *)) | .
+    }
+
+    ::// throw({} (* err::invalid_op *)) .
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+Ursus Definition recv_internal(in_msg_full:cell_)(s:slice_):UExpression PhantomType true.
+{
+    (* slice cs = in_msg_full.begin_parse(); *)
+    ::// var0 cs: TvmSlice := tvm_get_data () (* in_msg_full *) -> toSlice() ; _ | .  (* ????????????????? *)
+
+    (* int flags = cs~load_uint(4); *)
+    ::// var0 flags :_ := cs -> load(int256 (* 4 *));_| .
+
+    (* slice src = cs~load_msg_addr(); *)
+    ::// var0 src_address : address := cs -> load (address) ; _ | .
+    ::// var0 src_builder : TvmBuilder; _ |.
+    ::// src_builder -> store (src_address) ; _ |.
+    ::// var0 src:_ := src_builder -> toCell() -> toSlice () ; _ |.
+
+    ::// load_data().
+    ::// route_internal_message(flags, src, s, cs) .
+    ::// save_data() .
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+(* (int, slice, slice, cell) get_wallet_data () method_id { *)
+Ursus Definition get_wallet_data:UExpression (int256 * slice_ * slice_ * cell_) true.
+{
+    ::// load_data() .
+refine __return__.
+}
+return (* ( tokens, owner, parent, my_code() ) *) .
+Defined.
+Sync.
+
+(* (int, cell, int) get_wallet_state() method_id { *)
+Ursus Definition get_wallet_state:UExpression (int256 * cell_ * int256) true.
+{
+    ::// load_data() .
+refine __return__.
+}
+return (* ( tokens, staking, unstaking ) *) .
+Defined.
+Sync.
+
+(* var get_wallet_fees() method_id { *)
+Ursus Definition get_wallet_fees:UExpression PhantomType false.
+{
+    (* int forward_fee = get_forward_fee(1 + 3, 1023 * 2, false); *)
+    ::// var0 forward_fee:_:=get_forward_fee({1} + {3}, {1023} * {2}, {false});_|.
+refine __return__.
+}
+return . (* ( send_tokens_fee() + forward_fee
+        , unstake_tokens_fee()
+        , upgrade_wallet_fee()
+        , wallet_storage_fee()
+        ) *) 
+Defined.
+Sync.
+
+
+
+
+
+
+
+
+
 
 
