@@ -632,23 +632,317 @@ return .
 Defined.
 Sync.
 
-() rollback_unstake(slice src, slice s) impure inline {
+Ursus Definition rollback_unstake(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
+    (* int amount = s~load_coins(); *)
+    ::// var0 amount:_ := s -> load(int256);_ | .
+    (* s.end_parse(); *)
+
+    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent) (* , err::access_denied *));_| .
+
+    ::// tokens += amount.
+    ::// unstaking -= amount.
+
+    (* builder excess = begin_cell() *)
+    ::// var0 reserve : TvmBuilder ; _ |.
+    (* .store_uint(op::gas_excess, 32) *)
+    ::// reserve -> store ({} (* op::gas_excess, 32 *)) .
+    (* .store_uint(query_id, 64); *)
+    ::// reserve -> store (query_id (* 64 *)) .
+(*     send_msg(false, owner.to_builder(), null(), excess, 0, send::remaining_value + send::ignore_errors); *)
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+Ursus Definition tokens_burned(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
+    (* int amount = s~load_coins(); *)
+    ::// var0 amount:_ := s -> load(int256);_ | .
+    (* int coins = s~load_coins(); *)
+    ::// var0 coins:_ := s -> load(int256);_ | .
+    (* s.end_parse(); *)
+
+    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent) (* , err::access_denied *));_| .
+
+    ::// unstaking -= amount .
+
+    (* raw_reserve(wallet_storage_fee(), reserve::at_most); *)
+    ::// raw_reserve(wallet_storage_fee ( ), {} (* reserve::at_most *)).
+
+    (* builder notification = begin_cell() *)
+    ::// var0 notification : TvmBuilder ; _ |.
+       (*  .store_uint(op::withdrawal_notification, 32) *)
+    ::// notification -> store ({}(* op::transfer_notification, 32 *)) .
+        (* .store_uint(query_id, 64) *)
+    ::// notification -> store (query_id(* 64 *)) .
+        (* .store_coins(amount) *)
+    ::// notification -> store (amount) .
+        (* .store_coins(coins); *)
+    ::// notification -> store (coins) .
+(*     send_msg(false, owner.to_builder(), null(), notification, coins, send::unreserved_balance + send::ignore_errors); *)
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+Ursus Definition unstake_all(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
+    (* s.end_parse(); *)
+
+    (* throw_unless(err::access_denied, equal_slice_bits(src, parent) | equal_slice_bits(src, owner)); *)
+    ::// require_ (equal_slice_bits(src, parent) || equal_slice_bits(src, owner)
+                                                          (* , err::access_denied *));_| .
+
+    (* builder unstake = begin_cell() *)
+    ::// var0 unstake : TvmBuilder ; _ |.
+       (*  .store_uint(op::unstake_tokens, 32) *)
+    ::// unstake -> store ({}(* op::unstake_tokens, 32 *)) .
+        (* .store_uint(query_id, 64) *)
+    ::// unstake -> store (query_id(* 64 *)) .
+        (* .store_coins(tokens) *)
+    ::// unstake -> store (tokens) .
+        (* .store_uint(0, 3); ;; 00 (addr_none) + 0 (custom_payload) *)
+    ::// unstake -> store ({}(* 3 *)) .
+(*     send_msg(false, my_address().to_builder(), null(), unstake, 0, send::remaining_value); *)
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+Ursus Definition upgrade_wallet_fee:UExpression int256 false.
+{
+    (* int compute_gas = *)
+    :://var0 compute_gas:int256:={} ;_|.
+       (*  gas::upgrade_wallet +
+        gas::proxy_migrate_wallet +
+        gas::migrate_wallet +
+        gas::proxy_merge_wallet +
+        gas::merge_wallet; *)
+    :://var0 compute_fee:_:= get_compute_fee(compute_gas, {false});_|.
+
+    (* int m_fwd_fee = get_forward_fee(1, 1023, false); *)
+    :://var0 m_fwd_fee:_:= get_forward_fee({1}, {1023}, {false});_|.
+
+    (* int l_fwd_fee = get_forward_fee(1 + 3, 1023 * 2, false); *)
+    :://var0 l_fwd_fee:_:= get_forward_fee({1} + {3}, {1023} * {2}, {false});_|.
+
+   (*  int forward_fee = *)
+    :://var0 forward_fee:_:=
+        m_fwd_fee + (* ;; proxy_migrate_wallet *)
+        m_fwd_fee + (* ;; migrate_wallet *)
+        m_fwd_fee + (* ;; proxy_merge_wallet *)
+        l_fwd_fee;_|. (* ;; merge_wallet *)
+refine __return__.
+}
+return \\ tokens. (* return compute_fee + forward_fee; *)
+Defined.
+Sync.
+
+
+Ursus Definition upgrade_wallet(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
+    (* s.end_parse(); *)
+
+    (* int incoming_ton = get_incoming_value().pair_first(); *)
+    ::// var0 incoming_ton : int256 := {} (* get_incoming_value() .pair_first() *);_|.
+
+    ::// var0 fee:_ := upgrade_wallet_fee();_|.
+    (* int fee = upgrade_wallet_fee(); *)
+
+    (* int enough_fee? = incoming_ton >= fee; *)
+    ::// var0 enough_fee:_:= incoming_ton >= fee;_|.
+
+    (* throw_unless(err::access_denied, equal_slice_bits(src, owner) | equal_slice_bits(src, parent)); *)
+    ::// require_(equal_slice_bits(src, owner) || equal_slice_bits(src, parent) (* , err::access_denied *));_|.
+    (* throw_unless(err::insufficient_fee, enough_fee?); *)
+    ::// require_(enough_fee (* , err::insufficient_fee *));_|.
+
+    (* builder migrate = begin_cell() *)
+    ::// var0 migrate : TvmBuilder ; _ |.
+        (* store_uint(op::proxy_migrate_wallet, 32) *)
+    ::// migrate -> store ({}(* op::proxy_migrate_wallet, 32 *)) .
+        (* .store_uint(query_id, 64) *)
+    ::// migrate -> store (query_id(* 64 *)) .
+        (* .store_coins(tokens) *)
+    ::// migrate -> store (tokens) .
+        (* .store_slice(owner); *)
+    ::// migrate -> store (owner) .
+  (*   send_msg(true, parent.to_builder(), null(), migrate, 0, send::unreserved_balance); *)
+
+    (* tokens = 0; *)
+    ::// tokens := {} . (* {0} *)
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+
+Ursus Definition merge_wallet(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
+    (* int new_tokens = s~load_coins(); *)
+    ::// var0 new_tokens:_ := s -> load(int256);_ | .
+
+    (* s.end_parse(); *)
+
+    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent) (* , err::access_denied *));_|.
+
+    ::// tokens += new_tokens. 
+
+    ::// raw_reserve(wallet_storage_fee(), {} (* reserve::at_most *)) .
+
+    (* builder excess = begin_cell() *)
+    ::// var0 excess : TvmBuilder ; _ |.
+        (* .store_uint(op::gas_excess, 32) *)
+    ::// excess -> store ({}(* op::gas_excess, 32 *)) .
+         (* .store_uint(query_id, 64); *)
+    ::// excess -> store (query_id(* 64 *)) .
+(*     send_msg(false, owner.to_builder(), null(), excess, 0, send::unreserved_balance + send::ignore_errors); *)
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+
+Ursus Definition throw(src:uint256):UExpression PhantomType false.
+{
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+Ursus Definition withdraw_surplus(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
+    (* slice return_excess = s~load_msg_addr(); *)
+    ::// var0 return_address : address := s -> load (address) ; _ | .
+    ::// var0 return_builder : TvmBuilder; _ |.
+    ::// return_builder -> store (return_address) ; _ |.
+    ::// var0 return_excess:_ := return_builder -> toCell() -> toSlice () ; _ |.
+    (* s.end_parse(); *)
+
+    ::// if({true}(* return_excess.addr_none?( *)) then { ->> }.
+    {
+        ::// return_excess := src | .
+    }
+
+    (* throw_unless(err::access_denied, equal_slice_bits(src, owner)); *)
+    ::// require_ (equal_slice_bits(src, owner) (* err::access_denied *));_|.
+
+    ::// raw_reserve(wallet_storage_fee(), {} (* reserve::at_most *));_|.
+
+    (* builder excess = begin_cell() *)
+    ::// var0 excess : TvmBuilder ; _ |.
+        (* .store_uint(op::gas_excess, 32) *)
+    ::// excess -> store ({} (* op::gas_excess, 32 *)) .
+        (* .store_uint(query_id, 64); *)
+    ::// excess -> store (query_id (* 64 *)) .
+(*     send_msg(false, return_excess.to_builder(), null(), excess, 0, send::unreserved_balance + send::ignore_errors); *)
+
+    ::// throw({0}) .
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+Ursus Definition withdraw_jettons(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
+    (* slice child_wallet = s~load_msg_addr(); *)
+    ::// var0 child_address : address := s -> load (address) ; _ | .
+    ::// var0 child_builder : TvmBuilder; _ |.
+    ::// child_builder -> store (child_address) ; _ |.
+    ::// var0 child_address:_ := child_builder -> toCell() -> toSlice () ; _ |.
+    (* int tokens = s~load_coins(); *)
+    ::// var0 tokens:_ := s -> load(int256);_ | .
+    (* cell custom_payload = s~load_maybe_ref(); *)
+    ::// var0 custom_payload:_:= (* s -> *)load_maybe_ref() ;_| .  (* ????????????????? *)
+    (* s.end_parse(); *)
+
+    (* throw_unless(err::access_denied, equal_slice_bits(src, owner)); *)
+    ::// require_ (equal_slice_bits(src, owner) (* , err::access_denied *));_|.
+
+    (* builder send = begin_cell() *)
+    ::// var0 send' : TvmBuilder ; _ |.
+        (* .store_uint(op::send_tokens, 32) *)
+    ::// send' -> store ({} (* op::send_tokens, 32 *)) .
+        (* .store_uint(query_id, 64) *)
+    ::// send' -> store (query_id (* 64 *)) .
+        (* .store_coins(tokens) *)
+    ::// send' -> store (tokens) .
+        (* .store_slice(owner) *)
+    ::// send' -> store (owner) .
+        (* .store_slice(owner) *)
+    ::// send' -> store (owner) .
+       (*  .store_maybe_ref(custom_payload) *)
+    ::// send' -> store ({} (* custom_payload *)) .   (* ??????????????????????? *)
+        (* .store_coins(0) *)
+    ::// send' -> store ({}) .
+        (* .store_int(false, 1); *)
+    ::// send' -> store ({false} (* 1 *)) . (* ????????????????????? *)
+  (*   send_msg(true, child_wallet.to_builder(), null(), send, 0, send::remaining_value); *)
+
+    ::// throw({0}).
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+() on_bounce(slice src, slice s) impure inline {
+    ;; this should not happen but in a rare case of a bounce (e.g. a frozen account), at least recover tokens
+
+    s~load_uint(32);
+    int op = s~load_uint(32);
     int query_id = s~load_uint(64);
-    int amount = s~load_coins();
-    s.end_parse();
 
-    throw_unless(err::access_denied, equal_slice_bits(src, parent));
+    if op == op::receive_tokens {
+        int amount = s~load_coins();
+        tokens += amount;
+    }
 
-    tokens += amount;
-    unstaking -= amount;
+    if op == op::proxy_reserve_tokens {
+        int amount = s~load_coins();
+        tokens += amount;
+        unstaking -= amount;
+    }
 
+    if op == op::proxy_migrate_wallet {
+        int amount = s~load_coins();
+        tokens += amount;
+    }
+
+    if op == op::send_tokens {
+        ;; do nothing
+    }
+
+    ;; send back excess gas to owner which is usually the original sender
     builder excess = begin_cell()
         .store_uint(op::gas_excess, 32)
         .store_uint(query_id, 64);
     send_msg(false, owner.to_builder(), null(), excess, 0, send::remaining_value + send::ignore_errors);
 }
-
-
-
 
 
