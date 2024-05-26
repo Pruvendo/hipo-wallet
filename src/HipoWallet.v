@@ -42,6 +42,7 @@ UseLocal Definition _ := [ TvmBuilder ;
                            TvmSlice ; 
                            (optional (TvmCell ** TvmSlice));
                            (optional (address ** TvmSlice));
+PhantomType;
                            (optional (int256 ** TvmSlice)) ].
 
 Print Instances SolTypable.
@@ -176,6 +177,14 @@ Ursus Definition equal_slice_bits(src:slice_)(owner:slice_) : UExpression bool f
     refine __return__. 
 }
 return true.
+Defined.
+Sync.
+
+Ursus Definition my_address : UExpression slice_ false.
+{
+    refine __return__. 
+}
+return \\ parent.
 Defined.
 Sync.
 
@@ -435,13 +444,209 @@ return.
 Defined.
 Sync.
 
+Ursus Definition save_coins(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_:=s -> load(int256);_|. (* ????????????????????? *)
+    (* int coins = s~load_coins(); *)
+    ::// var0 coins:_:=s -> load(int256);_|.
+    (* s~load_msg_addr(); ;; skip owner address *)
+    ::// var0 xxx : address := s -> load (address) ; _ | .
+    ::// var0 yyy : TvmBuilder; _ |.
+    ::// yyy -> store (xxx) ; _ |.
+    ::// var0 zzz :_:= yyy -> toCell() -> toSlice () ; _ | .
+    (* int round_since = s~load_uint(32); *)
+    ::// var0 round_since:_:=s -> load(int256);_|. (* ????????????????????? *)
+    (* s.end_parse(); *)
+
+    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent) (* , err::access_denied *) ) ; _ | .
+
+    (* ( slice v, int f? ) = staking.udict_get?(32, round_since); *)
+    ::// if ({true})(* f? *) then { ->> } .
+    {
+        (* coins += v~load_coins(); *)
+        ::// coins += {} (* v -> load (int256) *) | .
+        (* v.end_parse(); *)
+    }
+    (* staking~udict_set_builder( 32 , round_since, begin_cell().store_coins(coins)); *)
+    ::// (* staking~ *)udict_set_builder( {} (* 32 *) , round_since, {} (* begin_cell().store_coins(coins) *)) | .
+}
+return.
+Defined.
+Sync.
+
+Ursus Definition get_compute_fee(x:int256)(y:bool):UExpression int256 false.
+{
+    refine __return__.
+}
+return \\ tokens.
+Defined.
+Sync.
+
+Ursus Definition get_forward_fee(x:uint256)(y:uint256)(z:bool):UExpression int256 false.
+{
+    refine __return__.
+}
+return \\ tokens.
+Defined.
+Sync.
+
+Ursus Definition unstake_tokens_fee:UExpression int256 false.
+{
+    (* int compute_gas = *)
+    ::// var0 compute_gas:int256 := {} ;_|.
+(*         gas::unstake_tokens +
+        gas::proxy_reserve_tokens +
+        gas::reserve_tokens +
+        gas::mint_bill +
+        gas::assign_bill +
+        gas::burn_bill +
+        gas::bill_burned +
+        gas::burn_tokens +
+        gas::mint_bill +   ;; second try
+        gas::assign_bill + ;; second try
+        gas::burn_bill +   ;; second try
+        gas::bill_burned + ;; second try
+        gas::burn_tokens + ;; second try
+        gas::proxy_tokens_burned +
+        gas::tokens_burned; *)
+    (* int compute_fee = get_compute_fee(compute_gas, false); *)
+    ::// var0 compute_fee:_:= get_compute_fee(compute_gas, {false}); _| .
+
+    (* int s_fwd_fee = get_forward_fee(0, 0, false);
+    int m_fwd_fee = get_forward_fee(1, 1023, false);
+    int l_fwd_fee = get_forward_fee(1 + 3, 1023 * 2, false); *)
+    ::// var0 s_fwd_fee:_:= get_forward_fee({0}, {0}, {false}); _| .
+    ::// var0 m_fwd_fee:_:= get_forward_fee({1}, {1023}, {false}); _| .
+    ::// var0 l_fwd_fee:_:= get_forward_fee({1} + {3}, {1023} * {2}, {false}); _| .
+
+    (* int forward_fee = *)
+    ::// var0 forward_fee :_:=
+        m_fwd_fee + (* ;; proxy_reserve_tokens *)
+        m_fwd_fee + (* ;; reserve_tokens *)
+        l_fwd_fee + (* ;; mint_bill *)
+        l_fwd_fee + (* ;; assign_bill *)
+        s_fwd_fee + (* ;; ownership_assigned *)
+        s_fwd_fee + (* ;; burn_bill *)
+        m_fwd_fee + (* ;; bill_burned *)
+        m_fwd_fee + (* ;; burn_tokens *)
+        l_fwd_fee + (* ;; mint_bill - second try *)
+        l_fwd_fee + (* ;; assign_bill - second try *)
+        s_fwd_fee + (* ;; burn_bill - second try *)
+        m_fwd_fee + (* ;; bill_burned - second try *)
+        m_fwd_fee + (* ;; burn_tokens - second try *)
+        m_fwd_fee + (* ;; proxy_tokens_burned *)
+        m_fwd_fee;_|. (* ;; tokens_burned *)
+    refine __return__.
+}
+return \\ tokens. (* compute_fee + forward_fee; *)
+Defined.
+Sync.
 
 
+Ursus Definition unstake_tokens(src:slice_)(s:slice_):UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_:=s -> load(int256);_|. (* ????????????????????? *)
+    (* int amount = s~load_coins(); *)
+    ::// var0 amount:_:=s -> load(int256);_|.
 
+    (* slice return_excess = s~load_msg_addr(); *)
+    ::// var0 return_address : address := s -> load (address) ; _ | .
+    ::// var0 return_builder : TvmBuilder; _ |.
+    ::// return_builder -> store (return_address) ; _ |.
+    ::// var0 return_excess:_ := return_builder -> toCell() -> toSlice () ; _ |.
 
+    (* cell custom_payload = s~load_maybe_ref(); *)
+    ::// var0 custom_payload:_:= (* s -> *)load_maybe_ref() ;_| .  (* ????????????????? *)
 
+   (*  s.end_parse(); *)
 
+    (* int mode = unstake::auto; *)
+    ::// var0 mode:int256:= {} (* unstake::auto *);_|.
+    (* int ownership_assigned_amount = 0; *)
+    ::// var0 ownership_assigned_amount:int256 := {};_|.   (* ????????????????? *)
 
+    (* ifnot custom_payload.null?() { *)
+    ::// if (!{true})(* custom_payload.null?() *) then { ->/> } .
+      {
+        (* slice ss = custom_payload.begin_parse(); *)
+        ::// var0 ss: TvmSlice := tvm_get_data () (* custom_payload *) -> toSlice() ; _ | .  (* ????????????????? *)
+        (* mode = ss~load_uint(4); *)
+        ::// mode := ss -> load(int256 (* 4 *)) .
+
+        (* ownership_assigned_amount = ss~load_coins(); *)
+        ::// ownership_assigned_amount := ss -> load(int256) | .
+       (*  ss.end_parse(); *)
+    }
+
+    (* int incoming_ton = get_incoming_value().pair_first(); *)
+    ::// var0 incoming_ton:int256 := {} (* get_incoming_value().pair_first() *);_|.
+
+    (* int fee = unstake_tokens_fee() + ownership_assigned_amount; *)
+    ::// var0 fee:int256 := unstake_tokens_fee() + ownership_assigned_amount;_|.
+
+    (* int enough_fee? = incoming_ton >= fee; *)
+    ::// var0 enough_fee:_:= incoming_ton >= fee;_|.
+
+    (* int valid? = equal_slice_bits(return_excess, owner) | (return_excess.addr_none?()); *)
+    ::// var0 valid:_:= equal_slice_bits(return_excess, owner) || {} (*return_excess.addr_none?()*);_|.
+      (* valid? &= (mode >= unstake::auto) & (mode <= unstake::best); *)
+    (* TODO may be there arent boolean operations for int256? *)
+    (* (* ::// valid &= (mode >= tokens (* unstake::auto *)) && (mode <= tokens (* unstake::best *)) . *) *)
+
+(*  throw_unless(err::access_denied, equal_slice_bits(src, owner) | equal_slice_bits(src, my_address()));
+    throw_unless(err::invalid_parameters, valid?);
+    throw_unless(err::insufficient_fee, enough_fee?);
+    throw_unless(err::insufficient_funds, (amount > 0) & (amount <= tokens)); *)
+
+    ::// require_ ((equal_slice_bits(src, owner)) 
+                 || (equal_slice_bits(src, my_address() (* , err::access_denied *)) ) ) ;_|. 
+    ::// require_ (valid (* , err::invalid_parameters *)) ;_|. 
+    ::// require_ (enough_fee (* , err::insufficient_fee *)) ;_|. 
+    (* TODO may be there arent boolean operations for int256? *)
+    ::// require_ ( {true} (* (amount > {0}) && (amount <= tokens) *) (* , err::insufficient_funds *)) ;_|. 
+
+    ::// tokens -= amount .
+    ::// unstaking += amount .
+
+    (* builder reserve = begin_cell() *)
+    ::// var0 reserve : TvmBuilder ; _ |.
+        (* .store_uint(op::proxy_reserve_tokens, 32) *)
+    ::// reserve -> store ({} (* op::proxy_reserve_tokens, 32 *)) .
+        (* .store_uint(query_id, 64) *)
+    ::// reserve -> store (query_id (* 64 *)) .
+        (* .store_coins(amount) *)
+    ::// reserve -> store (amount) .     
+        (* .store_slice(owner) *)
+    ::// reserve -> store (owner) .
+       (*  .store_uint(mode, 4) *)
+    ::// reserve -> store (mode (* 4 *)) .
+        (* .store_coins(ownership_assigned_amount); *)
+    ::// reserve -> store (ownership_assigned_amount) .     
+    (* send_msg(true, parent.to_builder(), null(), reserve, 0, send::remaining_value); *)
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+() rollback_unstake(slice src, slice s) impure inline {
+    int query_id = s~load_uint(64);
+    int amount = s~load_coins();
+    s.end_parse();
+
+    throw_unless(err::access_denied, equal_slice_bits(src, parent));
+
+    tokens += amount;
+    unstaking -= amount;
+
+    builder excess = begin_cell()
+        .store_uint(op::gas_excess, 32)
+        .store_uint(query_id, 64);
+    send_msg(false, owner.to_builder(), null(), excess, 0, send::remaining_value + send::ignore_errors);
+}
 
 
 
