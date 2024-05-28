@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-05-25T20:36:21.145Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="WXkuJTsWxndFcH9y8dXE" version="24.4.0" type="device" pages="9">
+<mxfile host="Electron" modified="2024-05-27T21:14:27.615Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="eUk2_YscL3BTjl2mDDh8" version="24.4.0" type="device" pages="9">
   <diagram name="1" id="3gOTRgeiZwrZgq-XQjOY">
     <mxGraphModel dx="994" dy="731" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
@@ -850,9 +850,11 @@
             <mxPoint x="-156" y="630" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Dtw_vhP6r3Fr4DgGwAfG-5" value="Tokens minted" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="ZxapLbhsnTIVHqIm46iQ-35" vertex="1">
-          <mxGeometry x="14" y="590" width="120" height="60" as="geometry" />
-        </mxCell>
+        <UserObject label="Tokens minted" link="./TokensMinted.html" id="Dtw_vhP6r3Fr4DgGwAfG-5">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="ZxapLbhsnTIVHqIm46iQ-35" vertex="1">
+            <mxGeometry x="14" y="590" width="120" height="60" as="geometry" />
+          </mxCell>
+        </UserObject>
         <mxCell id="Dtw_vhP6r3Fr4DgGwAfG-67" value="Exception" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;" parent="ZxapLbhsnTIVHqIm46iQ-35" source="Dtw_vhP6r3Fr4DgGwAfG-6" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="-156" y="630" as="targetPoint" />
@@ -889,9 +891,11 @@
         <mxCell id="Dtw_vhP6r3Fr4DgGwAfG-70" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="ZxapLbhsnTIVHqIm46iQ-35" source="Dtw_vhP6r3Fr4DgGwAfG-9" target="Dtw_vhP6r3Fr4DgGwAfG-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="Dtw_vhP6r3Fr4DgGwAfG-9" value="Save coins" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="ZxapLbhsnTIVHqIm46iQ-35" vertex="1">
-          <mxGeometry x="234" y="590" width="120" height="60" as="geometry" />
-        </mxCell>
+        <UserObject label="Save coins" link="./SaveCoins.html" id="Dtw_vhP6r3Fr4DgGwAfG-9">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="ZxapLbhsnTIVHqIm46iQ-35" vertex="1">
+            <mxGeometry x="234" y="590" width="120" height="60" as="geometry" />
+          </mxCell>
+        </UserObject>
         <mxCell id="Dtw_vhP6r3Fr4DgGwAfG-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="ZxapLbhsnTIVHqIm46iQ-35" source="Dtw_vhP6r3Fr4DgGwAfG-10" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="-6" y="50" as="targetPoint" />
@@ -1692,9 +1696,11 @@
             <mxPoint x="-156" y="630" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="ubliVszs47UPIlklkwzj-28" value="Tokens minted" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="ubliVszs47UPIlklkwzj-9" vertex="1">
-          <mxGeometry x="14" y="590" width="120" height="60" as="geometry" />
-        </mxCell>
+        <UserObject label="Tokens minted" link="./TokensMinted.html" id="ubliVszs47UPIlklkwzj-28">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="ubliVszs47UPIlklkwzj-9" vertex="1">
+            <mxGeometry x="14" y="590" width="120" height="60" as="geometry" />
+          </mxCell>
+        </UserObject>
         <mxCell id="ubliVszs47UPIlklkwzj-29" value="Exception" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;" parent="ubliVszs47UPIlklkwzj-9" source="ubliVszs47UPIlklkwzj-30" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="-156" y="630" as="targetPoint" />
@@ -1731,9 +1737,11 @@
         <mxCell id="ubliVszs47UPIlklkwzj-36" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="ubliVszs47UPIlklkwzj-9" source="ubliVszs47UPIlklkwzj-37" target="ubliVszs47UPIlklkwzj-39" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ubliVszs47UPIlklkwzj-37" value="Save coins" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="ubliVszs47UPIlklkwzj-9" vertex="1">
-          <mxGeometry x="234" y="590" width="120" height="60" as="geometry" />
-        </mxCell>
+        <UserObject label="Save coins" link="./SaveCoins.html" id="ubliVszs47UPIlklkwzj-37">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="ubliVszs47UPIlklkwzj-9" vertex="1">
+            <mxGeometry x="234" y="590" width="120" height="60" as="geometry" />
+          </mxCell>
+        </UserObject>
         <mxCell id="ubliVszs47UPIlklkwzj-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="ubliVszs47UPIlklkwzj-9" source="ubliVszs47UPIlklkwzj-39" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="-6" y="50" as="targetPoint" />
