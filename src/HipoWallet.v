@@ -16,12 +16,17 @@ Inherits EverBaseContract ;
 Types ;
 Constants 
 
+Definition chain_base : uint256 := 0
+
 Definition err_only_basechain_allowed : uint256 := 104
 Definition err_access_denied          : uint256 := 103
 Definition err_insufficient_funds     : uint256 := 102
-Definition err_receiver_is_sender     : uint256 := 105;
+Definition err_insufficient_fee       : uint256 := 101
+Definition err_receiver_is_sender     : uint256 := 105
+Definition err_invalid_parameters     : uint256 := 109;
 
 Record Contract := {
+tmp_tuple:(builder_ * builder_ * int) ;
     owner: TvmSlice;
     parent: TvmSlice;
     tokens: int256;
@@ -46,6 +51,7 @@ UseLocal Definition _ := [ TvmBuilder ;
                            (optional (TvmCell ** TvmSlice));
                            (optional (address ** TvmSlice));
 PhantomType;
+                           (builder_ ** builder_ ** int) ;
                            (optional (int256 ** TvmSlice)) ].
 
 Print Instances SolTypable.
@@ -191,13 +197,82 @@ return \\ parent.
 Defined.
 Sync.
 
+Ursus Definition create_wallet_data (owner:builder_)(parent:slice_) : UExpression cell_ false.
+{
+    refine __return__.
+}    
+return \\ staking (* begin_cell()
+        .store_builder(owner)
+        .store_slice(parent)
+        .store_coins(0) ;; tokens
+        .store_dict(null()) ;; staking
+        .store_coins(0) ;; unstaking
+        .end_cell(); *) .
+Defined.
+Sync.
+
+Ursus Definition create_state_init (code:cell_)(data:cell_) : UExpression builder_ false.
+{
+    refine __return__.
+}
+return (* begin_cell()
+        .store_uint(6, 5) ;; 00110
+        .store_ref(code)
+        .store_ref(data); *) .
+Defined.
+Sync.
+
+Ursus Definition create_address (wc:uint256)(addr:int256) : UExpression builder_ false.
+{
+    refine __return__.
+}
+return (* begin_cell()
+        .store_uint(4, 3) ;; 100
+        .store_int(wc, 8)
+        .store_uint(addr, 256); *) .
+Defined.
+Sync.
+
+Ursus Definition create_wallet_address (owner:builder_)(parent:slice_)(wallet_code:cell_) : UExpression (builder_ * builder_ * int) false.
+{
+    (* cell wallet_data = create_wallet_data(owner, parent); *)
+    ::// var0 wallet_data : cell_ := create_wallet_data( {} (* owner *) , parent ) ; _ | .
+    (* builder state_init = create_state_init(wallet_code, wallet_data);  *)
+    ::// var0 state_init:builder_ := create_state_init(wallet_code, wallet_data); _ | .
+    (* int addr = state_init.end_cell().cell_hash(); *)
+    ::// var0 addr:int256 := {} (* state_init.end_cell().cell_hash() *) ;_|.
+    (* builder wallet = create_address(chain::base, addr); *)
+    ::// var0 wallet : builder_ := create_address( chain_base , addr );_|.
+    refine __return__.
+}
+return (* (wallet, state_init, addr); *) .
+Defined.
+Sync.
+
+Ursus Definition my_code : UExpression cell_ false .
+{
+    refine __return__.
+}
+return .
+Defined.
+Sync.
+
+Ursus Definition parse_std_addr (s:slice_) : UExpression (int256 * int256) false .
+{
+    refine __return__.
+}
+return .
+Defined.
+Sync.
+
+
 Ursus Definition send_tokens(src:slice_)(s:slice_)(fwd_fee:uint256):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id: _ := s -> load(int256); _ | . (* ????????????????? *)
     (* int amount = s~load_coins(); *)
     ::// var0 amount: _ := s -> load(int256);_ | . 
-   (*  slice recipient = s~load_msg_addr(); *)
+   (*  slice recipient = s~load_msg_addr(); *)    
     ::// var0 recipient_address : address := s -> load (address) ; _ | .
     ::// var0 recipient_builder : TvmBuilder; _ |.
     ::// recipient_builder -> store (recipient_address) ; _ |.
@@ -230,13 +305,14 @@ Ursus Definition send_tokens(src:slice_)(s:slice_)(fwd_fee:uint256):UExpression 
     :://if({} (* return_excess->isEmpty() *)) then {->>} .  (* ????????????????? *)
        { ::// return_excess := src | . }
 
-    (* ( int recipient_wc, _ ) = parse_std_addr(recipient); *)
+    ::// var ( recipient_wc:int256, tmp:int256 ) := parse_std_addr(recipient);_|.
 (*    ::// var0 ( recipient_wc , _ ) := parse_std_addr(slice) ;_|. parse_std_addr(recipient); *)
 
-(*     ( builder wallet, builder state_init, _ ) = create_wallet_address(recipient.to_builder(), parent, my_code()); *)
+    ::// var0 ( wallet:builder_ , state_init:builder_ , tmp1:int256 ) 
+         := {} (* create_wallet_address( {} (* recipient.to_builder() *), {} (* parent *), {} (* my_code() *) ) *) ;_|.
 
     (* int incoming_ton = get_incoming_value().pair_first(); *)
-    ::// var0 incoming_ton:int256:= {} (* get_incoming_value().pair_first() *); _ | .
+    ::// var0 incoming_ton:int256:= {} (* get_incoming_value().pair_first() *); _ | .Ursus Definition 
 
     (* int fee = send_tokens_fee() + forward_ton_amount + (forward_ton_amount ? 2 : 1) * fwd_fee; *)
     ::// var0 fee:int256:= send_tokens_fee() + forward_ton_amount (* + (forward_ton_amount ? {2} : {1}) * fwd_fee *);_|.
@@ -244,20 +320,19 @@ Ursus Definition send_tokens(src:slice_)(s:slice_)(fwd_fee:uint256):UExpression 
     (* int enough_fee? = incoming_ton >= fee; *)
     ::// var0 enough_fee:bool:= incoming_ton >= fee;_|.
 
-(*     throw_unless(err::only_basechain_allowed, recipient_wc == chain::base);
-    throw_unless(err::access_denied, equal_slice_bits(src, owner));
-    throw_unless(err::insufficient_fee, enough_fee?);
-    throw_unless(err::insufficient_funds, amount <= tokens);
-    throw_if(err::receiver_is_sender, equal_slice_bits(recipient, owner)); (* ????????????????? *)
+(*     throw_unless(err_only_basechain_allowed, recipient_wc == chain::base);
+    throw_unless(err_access_denied, equal_slice_bits(src, owner));
+    throw_unless(err_insufficient_fee, enough_fee?);
+    throw_unless(err_insufficient_funds, amount <= tokens);
+    throw_if(err_receiver_is_sender, equal_slice_bits(recipient, owner)); (* ????????????????? *)
  *)
 
-refine // require_ ({true} , {urvalue_bind err_only_basechain_allowed_right (fun x => URScalar (IntError (uint256 x)))});_ | .
-
-   ::// require ((* recipient_wc *) {true} == {true} (* chain::base *) , {err_only_basechain_allowed%N} ) ;_ | .
-   ::// require_ (equal_slice_bits(src, owner) , err_access_denied ) ;_ | .
-   ::// require_ (enough_fee  , err_insufficient_fee ) ;_ | .
-   ::// require_ (amount <= tokens  , err_insufficient_funds  ) ;_ | .
-   ::// require_ (equal_slice_bits(recipient, owner)  , err_receiver_is_sender  ) ;_ | .
+   :: // require_ ((* recipient_wc *) {true} (* ==  {urvalue_bind chain_base_right (fun x => URScalar (IntError (uint2N x)))} *)  
+                 , {urvalue_bind err_only_basechain_allowed_right (fun x => URScalar (IntError (uint2N x)))});_ | .
+   ::// require_ (equal_slice_bits(src, owner) , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))} ) ;_ | .
+   ::// require_ (enough_fee  , {urvalue_bind err_insufficient_fee_right (fun x => URScalar (IntError (uint2N x)))} ) ;_ | .
+   ::// require_ (amount <= tokens  , {urvalue_bind err_insufficient_funds_right (fun x => URScalar (IntError (uint2N x)))}  ) ;_ | .
+   ::// require_ (equal_slice_bits(recipient, owner)  , {urvalue_bind err_receiver_is_sender_right (fun x => URScalar (IntError (uint2N x)))}  ) ;_ | .
 
     (* tokens -= amount; *)
     ::// tokens -= amount.
@@ -312,9 +387,6 @@ return.
 Defined.
 Sync.
 
-
-
-
 Ursus Definition receive_tokens(src:slice_)(s:slice_):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
@@ -340,13 +412,13 @@ Ursus Definition receive_tokens(src:slice_)(s:slice_):UExpression PhantomType tr
 
     ::// var0 forward_payload:_ := s;_|.
 
-    (* ( _, _, int wallet_addr ) = create_wallet_address(sender.to_builder(), parent, my_code()); *)
+    ::// var ( a:, _, int wallet_addr:int256 ) = create_wallet_address(sender.to_builder(), parent, my_code());
     (* ( int src_wc, int src_addr ) = parse_std_addr(src); *)
 
-    (* throw_unless(err::access_denied, (src_wc == chain::base) & (src_addr == wallet_addr)); *)
-    ::// require_ (((* src_wc *) {true} == {true} (* chain::base *)) 
-                       && ((* src_addr *) {true} == {true} (* wallet_addr *)) (* , err::access_denied *) ) ;_ | .
-
+    (* throw_unless(err_access_denied, (src_wc == chain::base) & (src_addr == wallet_addr)); *)
+    ::// require_ ( src_wc == {urvalue_bind chain_base_right (fun x => URScalar (IntError (uint2N x)))} 
+               , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))} ) ;_ | .
+   
     ::// tokens += amount.
 
     ::// if(forward_ton_amount) then { ->/> }.
@@ -408,8 +480,8 @@ Ursus Definition tokens_minted(src:slice_)(s:slice_):UExpression PhantomType tru
     ::// var0 round_since:_:=s -> load(int256);_|. (* ????????????????????? *)
     (* s.end_parse(); *)
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
-    ::// require_ (equal_slice_bits(src, parent) (*, err::access_denied *) ) ;_|.
+    (* throw_unless(err_access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent) , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))} ) ;_|.
 
     ::// tokens += amount .
 
@@ -464,8 +536,8 @@ Ursus Definition save_coins(src:slice_)(s:slice_):UExpression PhantomType true.
     ::// var0 round_since:_:=s -> load(int256);_|. (* ????????????????????? *)
     (* s.end_parse(); *)
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
-    ::// require_ (equal_slice_bits(src, parent) (* , err::access_denied *) ) ; _ | .
+    (* throw_unless(err_access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent)  , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))} ) ; _ | .
 
     (* ( slice v, int f? ) = staking.udict_get?(32, round_since); *)
     ::// if ({true})(* f? *) then { ->> } .
@@ -601,17 +673,17 @@ Ursus Definition unstake_tokens(src:slice_)(s:slice_):UExpression PhantomType tr
     (* TODO may be there arent boolean operations for int256? *)
     (* (* ::// valid &= (mode >= tokens (* unstake::auto *)) && (mode <= tokens (* unstake::best *)) . *) *)
 
-(*  throw_unless(err::access_denied, equal_slice_bits(src, owner) | equal_slice_bits(src, my_address()));
-    throw_unless(err::invalid_parameters, valid?);
-    throw_unless(err::insufficient_fee, enough_fee?);
-    throw_unless(err::insufficient_funds, (amount > 0) & (amount <= tokens)); *)
+(*  throw_unless(err_access_denied, equal_slice_bits(src, owner) | equal_slice_bits(src, my_address()));
+    throw_unless(err_invalid_parameters, valid?);
+    throw_unless(err_insufficient_fee, enough_fee?);
+    throw_unless(err_insufficient_funds, (amount > 0) & (amount <= tokens)); *)
 
     ::// require_ ((equal_slice_bits(src, owner)) 
-                 || (equal_slice_bits(src, my_address() (* , err::access_denied *)) ) ) ;_|. 
-    ::// require_ (valid (* , err::invalid_parameters *)) ;_|. 
-    ::// require_ (enough_fee (* , err::insufficient_fee *)) ;_|. 
+                 || (equal_slice_bits(src, my_address())) , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))} ) ;_|. 
+    ::// require_ (valid  , {urvalue_bind err_invalid_parameters_right (fun x => URScalar (IntError (uint2N x)))}) ;_|. 
+    ::// require_ (enough_fee  , {urvalue_bind err_insufficient_fee_right (fun x => URScalar (IntError (uint2N x)))}) ;_|. 
     (* TODO may be there arent boolean operations for int256? *)
-    ::// require_ ( {true} (* (amount > {0}) && (amount <= tokens) *) (* , err::insufficient_funds *)) ;_|. 
+    ::// require_ ( {true} (* (amount > {0}) && (amount <= tokens) *)  , {urvalue_bind err_insufficient_funds_right (fun x => URScalar (IntError (uint2N x)))}) ;_|. 
 
     ::// tokens -= amount .
     ::// unstaking += amount .
@@ -645,8 +717,8 @@ Ursus Definition rollback_unstake(src:slice_)(s:slice_):UExpression PhantomType 
     ::// var0 amount:_ := s -> load(int256);_ | .
     (* s.end_parse(); *)
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
-    ::// require_ (equal_slice_bits(src, parent) (* , err::access_denied *));_| .
+    (* throw_unless(err_access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent) , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))});_| .
 
     ::// tokens += amount.
     ::// unstaking -= amount.
@@ -674,8 +746,8 @@ Ursus Definition tokens_burned(src:slice_)(s:slice_):UExpression PhantomType tru
     ::// var0 coins:_ := s -> load(int256);_ | .
     (* s.end_parse(); *)
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
-    ::// require_ (equal_slice_bits(src, parent) (* , err::access_denied *));_| .
+    (* throw_unless(err_access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent) , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))});_| .
 
     ::// unstaking -= amount .
 
@@ -705,9 +777,9 @@ Ursus Definition unstake_all(src:slice_)(s:slice_):UExpression PhantomType true.
     ::// var0 query_id:_ := s -> load(int256 (* 64 *));_| .
     (* s.end_parse(); *)
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, parent) | equal_slice_bits(src, owner)); *)
+    (* throw_unless(err_access_denied, equal_slice_bits(src, parent) | equal_slice_bits(src, owner)); *)
     ::// require_ (equal_slice_bits(src, parent) || equal_slice_bits(src, owner)
-                                                          (* , err::access_denied *));_| .
+                                                           , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))});_| .
 
     (* builder unstake = begin_cell() *)
     ::// var0 unstake : TvmBuilder ; _ |.
@@ -771,10 +843,11 @@ Ursus Definition upgrade_wallet(src:slice_)(s:slice_):UExpression PhantomType tr
     (* int enough_fee? = incoming_ton >= fee; *)
     ::// var0 enough_fee:_:= incoming_ton >= fee;_|.
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, owner) | equal_slice_bits(src, parent)); *)
-    ::// require_(equal_slice_bits(src, owner) || equal_slice_bits(src, parent) (* , err::access_denied *));_|.
-    (* throw_unless(err::insufficient_fee, enough_fee?); *)
-    ::// require_(enough_fee (* , err::insufficient_fee *));_|.
+    (* throw_unless(err_access_denied, equal_slice_bits(src, owner) | equal_slice_bits(src, parent)); *)
+    ::// require_(equal_slice_bits(src, owner) || equal_slice_bits(src, parent) , 
+          {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))});_|.
+    (* throw_unless(err_insufficient_fee, enough_fee?); *)
+    ::// require_(enough_fee , {urvalue_bind err_insufficient_fee_right (fun x => URScalar (IntError (uint2N x)))} );_|.
 
     (* builder migrate = begin_cell() *)
     ::// var0 migrate : TvmBuilder ; _ |.
@@ -806,8 +879,8 @@ Ursus Definition merge_wallet(src:slice_)(s:slice_):UExpression PhantomType true
 
     (* s.end_parse(); *)
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, parent)); *)
-    ::// require_ (equal_slice_bits(src, parent) (* , err::access_denied *));_|.
+    (* throw_unless(err_access_denied, equal_slice_bits(src, parent)); *)
+    ::// require_ (equal_slice_bits(src, parent) , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))});_|.
 
     ::// tokens += new_tokens. 
 
@@ -851,8 +924,8 @@ Ursus Definition withdraw_surplus(src:slice_)(s:slice_):UExpression PhantomType 
         ::// return_excess := src | .
     }
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, owner)); *)
-    ::// require_ (equal_slice_bits(src, owner) (* err::access_denied *));_|.
+    (* throw_unless(err_access_denied, equal_slice_bits(src, owner)); *)
+    ::// require_ (equal_slice_bits(src, owner) , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))});_|.
 
     ::// raw_reserve(wallet_storage_fee(), {} (* reserve::at_most *));_|.
 
@@ -886,8 +959,8 @@ Ursus Definition withdraw_jettons(src:slice_)(s:slice_):UExpression PhantomType 
     ::// var0 custom_payload:_:= (* s -> *)load_maybe_ref() ;_| .  (* ????????????????? *)
     (* s.end_parse(); *)
 
-    (* throw_unless(err::access_denied, equal_slice_bits(src, owner)); *)
-    ::// require_ (equal_slice_bits(src, owner) (* , err::access_denied *));_|.
+    (* throw_unless(err_access_denied, equal_slice_bits(src, owner)); *)
+    ::// require_ (equal_slice_bits(src, owner) , {urvalue_bind err_access_denied_right (fun x => URScalar (IntError (uint2N x)))});_|.
 
     (* builder send = begin_cell() *)
     ::// var0 send' : TvmBuilder ; _ |.
@@ -1118,10 +1191,10 @@ Ursus Definition route_internal_message(flags:int256)(src:slice_)(s:slice_)(cs:s
              ::// exit_ unstake_all(src, {} (* "0000000000000000"s *)) | .
         }
 
-        ::// throw( {} (* err::invalid_comment *)) | .
+        ::// throw( {} (* err_invalid_comment *)) | .
     }
 
-    ::// throw({} (* err::invalid_op *)) .
+    ::// throw({} (* err_invalid_op *)) .
 refine __return__.
 }
 return .
@@ -1187,7 +1260,10 @@ Defined.
 Sync.
 
 
-
+EndContract Implements .
+GenerateLocalState 0 HipoWallet.
+Fail GenerateLocalState 1 HipoWallet.
+GenerateLocalState HipoWallet.
 
 
 
