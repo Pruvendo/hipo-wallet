@@ -14,11 +14,12 @@ Contract HipoWallet ;
 Sends To  ; 
 Inherits EverBaseContract ;
 Types ;
-Constants ;
-(* Definition MAX_UINT256 : uint256 := 1
-Definition MAX_UINT256_3 : uint256 := 5 
-Definition kokoko : string := "kokoko" 
-Definition Bool : bool := true; *)
+Constants 
+
+Definition err_only_basechain_allowed : uint256 := 104
+Definition err_access_denied          : uint256 := 103
+Definition err_insufficient_funds     : uint256 := 102
+Definition err_receiver_is_sender     : uint256 := 105;
 
 Record Contract := {
     owner: TvmSlice;
@@ -27,6 +28,8 @@ Record Contract := {
     staking: TvmCell;
     unstaking: int256
 } .
+
+(* Require Import UMLang.UrsusCoercions. *)
 
 SetUrsusOptions.
 
@@ -245,14 +248,16 @@ Ursus Definition send_tokens(src:slice_)(s:slice_)(fwd_fee:uint256):UExpression 
     throw_unless(err::access_denied, equal_slice_bits(src, owner));
     throw_unless(err::insufficient_fee, enough_fee?);
     throw_unless(err::insufficient_funds, amount <= tokens);
-    throw_if(err::receiver_is_sender, equal_slice_bits(recipient, owner));
+    throw_if(err::receiver_is_sender, equal_slice_bits(recipient, owner)); (* ????????????????? *)
  *)
 
-   ::// require_ ((* recipient_wc *) {true} == {true} (* chain::base , err::only_basechain_allowed *) ) ;_ | .
-   ::// require_ (equal_slice_bits(src, owner) (*, err::access_denied *) ) ;_ | .
-   ::// require_ (enough_fee (* , err::insufficient_fee *) ) ;_ | .
-   ::// require_ (amount <= tokens (* , err::insufficient_funds *) ) ;_ | .
-   ::// require_ (equal_slice_bits(recipient, owner) (* , err::receiver_is_sender *) ) ;_ | .
+refine // require_ ({true} , {urvalue_bind err_only_basechain_allowed_right (fun x => URScalar (IntError (uint256 x)))});_ | .
+
+   ::// require ((* recipient_wc *) {true} == {true} (* chain::base *) , {err_only_basechain_allowed%N} ) ;_ | .
+   ::// require_ (equal_slice_bits(src, owner) , err_access_denied ) ;_ | .
+   ::// require_ (enough_fee  , err_insufficient_fee ) ;_ | .
+   ::// require_ (amount <= tokens  , err_insufficient_funds  ) ;_ | .
+   ::// require_ (equal_slice_bits(recipient, owner)  , err_receiver_is_sender  ) ;_ | .
 
     (* tokens -= amount; *)
     ::// tokens -= amount.
