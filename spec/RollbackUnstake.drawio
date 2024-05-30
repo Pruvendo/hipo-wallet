@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-05-28T17:49:44.278Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="weAzuu1ww3I0LPIkOq5k" version="24.4.0" type="device" pages="9">
+<mxfile host="Electron" modified="2024-05-30T19:17:22.688Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.8 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="sCt3Y01910iLQjp0TW0k" version="24.4.8" type="device" pages="9">
   <diagram name="1" id="3gOTRgeiZwrZgq-XQjOY">
     <mxGraphModel dx="994" dy="731" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
@@ -1566,20 +1566,20 @@
             <mxRectangle width="634" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="sz-yT7xVlD2NowLnNzdF-0" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;" vertex="1" parent="ofxqhu_4wROG4YphLrhh-0">
+        <mxCell id="sz-yT7xVlD2NowLnNzdF-0" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;" parent="ofxqhu_4wROG4YphLrhh-0" vertex="1">
           <mxGeometry y="160" width="1010" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="sz-yT7xVlD2NowLnNzdF-1" value="RUI.3" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;" vertex="1" parent="sz-yT7xVlD2NowLnNzdF-0">
+        <mxCell id="sz-yT7xVlD2NowLnNzdF-1" value="RUI.3" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;" parent="sz-yT7xVlD2NowLnNzdF-0" vertex="1">
           <mxGeometry width="89" height="40" as="geometry">
             <mxRectangle width="89" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="sz-yT7xVlD2NowLnNzdF-2" value="If amount of unstaked tokens is insufficient, the scenario must fail" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;align=left;" vertex="1" parent="sz-yT7xVlD2NowLnNzdF-0">
+        <mxCell id="sz-yT7xVlD2NowLnNzdF-2" value="If amount of unstaked tokens is insufficient, the scenario must fail" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;align=left;" parent="sz-yT7xVlD2NowLnNzdF-0" vertex="1">
           <mxGeometry x="89" width="287" height="40" as="geometry">
             <mxRectangle width="287" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="sz-yT7xVlD2NowLnNzdF-3" value="$$\{m.a&amp;gt;l.u\}u(ss,m)\{S=false\}$$" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;align=left;" vertex="1" parent="sz-yT7xVlD2NowLnNzdF-0">
+        <mxCell id="sz-yT7xVlD2NowLnNzdF-3" value="$$\{m.a&amp;gt;l.u\}u(ss,m)\{S=false\}$$" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;align=left;" parent="sz-yT7xVlD2NowLnNzdF-0" vertex="1">
           <mxGeometry x="376" width="634" height="40" as="geometry">
             <mxRectangle width="634" height="40" as="alternateBounds" />
           </mxGeometry>
@@ -1641,7 +1641,7 @@
         <mxCell id="GP6fKpy80-ey8A426-Z9-12" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;" parent="ofxqhu_4wROG4YphLrhh-0" vertex="1">
           <mxGeometry y="320" width="1010" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="GP6fKpy80-ey8A426-Z9-13" value="RUI.1" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;" parent="GP6fKpy80-ey8A426-Z9-12" vertex="1">
+        <mxCell id="GP6fKpy80-ey8A426-Z9-13" value="RUO.1" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;" parent="GP6fKpy80-ey8A426-Z9-12" vertex="1">
           <mxGeometry width="89" height="70" as="geometry">
             <mxRectangle width="89" height="70" as="alternateBounds" />
           </mxGeometry>
@@ -1659,7 +1659,7 @@
         <mxCell id="GP6fKpy80-ey8A426-Z9-20" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;" parent="ofxqhu_4wROG4YphLrhh-0" vertex="1">
           <mxGeometry y="390" width="1010" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="GP6fKpy80-ey8A426-Z9-21" value="RUI.2" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;" parent="GP6fKpy80-ey8A426-Z9-20" vertex="1">
+        <mxCell id="GP6fKpy80-ey8A426-Z9-21" value="RUO.2" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;" parent="GP6fKpy80-ey8A426-Z9-20" vertex="1">
           <mxGeometry width="89" height="70" as="geometry">
             <mxRectangle width="89" height="70" as="alternateBounds" />
           </mxGeometry>
@@ -1674,20 +1674,20 @@
             <mxRectangle width="634" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="sz-yT7xVlD2NowLnNzdF-4" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;" vertex="1" parent="ofxqhu_4wROG4YphLrhh-0">
+        <mxCell id="sz-yT7xVlD2NowLnNzdF-4" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=16;" parent="ofxqhu_4wROG4YphLrhh-0" vertex="1">
           <mxGeometry y="460" width="1010" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="sz-yT7xVlD2NowLnNzdF-5" value="RUI.3" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;" vertex="1" parent="sz-yT7xVlD2NowLnNzdF-4">
+        <mxCell id="sz-yT7xVlD2NowLnNzdF-5" value="RUO.3" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;" parent="sz-yT7xVlD2NowLnNzdF-4" vertex="1">
           <mxGeometry width="89" height="70" as="geometry">
             <mxRectangle width="89" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="sz-yT7xVlD2NowLnNzdF-6" value="Amount of unstaked tokens is decreased by message amount" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;align=left;" vertex="1" parent="sz-yT7xVlD2NowLnNzdF-4">
+        <mxCell id="sz-yT7xVlD2NowLnNzdF-6" value="Amount of unstaked tokens is decreased by message amount" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;align=left;" parent="sz-yT7xVlD2NowLnNzdF-4" vertex="1">
           <mxGeometry x="89" width="287" height="70" as="geometry">
             <mxRectangle width="287" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="sz-yT7xVlD2NowLnNzdF-7" value="$$\frac{\{\}u(m)\{S=true\}}{\{\forall{x\in{N}:x=l.u]}\}u(m)\{l.u=x-m.a\}}$$" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;align=left;" vertex="1" parent="sz-yT7xVlD2NowLnNzdF-4">
+        <mxCell id="sz-yT7xVlD2NowLnNzdF-7" value="$$\frac{\{\}u(m)\{S=true\}}{\{\forall{x\in{N}:x=l.u]}\}u(m)\{l.u=x-m.a\}}$$" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;fontSize=16;align=left;" parent="sz-yT7xVlD2NowLnNzdF-4" vertex="1">
           <mxGeometry x="376" width="634" height="70" as="geometry">
             <mxRectangle width="634" height="70" as="alternateBounds" />
           </mxGeometry>
