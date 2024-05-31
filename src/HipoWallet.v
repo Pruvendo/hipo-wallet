@@ -105,8 +105,8 @@ PhantomType;     (int256 ** int256 ** int256 ** int256); (uint256 ** uint256);
                            (builder_ ** builder_ ** int256) ;
                            (optional (int256 ** TvmSlice)) ].
 
-(*  #[returns=result_]
-Ursus Definition getToken : UExpression (uint256 * uint256 * uint256 (* * uint256 *)) false.
+(* #[returns=result_]
+Ursus Definition getToken : UExpression (int256 * int256 * int256) false.
 {
     :://  result_ := #{default}.
 
@@ -186,7 +186,7 @@ Ursus Definition get_storage_fee (cells:int256)(bits:int256)(seconds:int256)(is_
 {
     refine __return__.
 }
-return cells.
+return.
 Defined.
 Sync.
 
@@ -201,7 +201,7 @@ Ursus Definition wallet_storage_fee:UExpression int256 false.
 
     refine __return__.
 }
-return .         (* TODO *)
+return .
 Defined.
 Sync.
 
@@ -210,7 +210,7 @@ Ursus Definition get_compute_fee(x:int256)(y:bool):UExpression int256 false.
 {
     refine __return__.
 }
-return \\ tokens.
+return.
 Defined.
 Sync.
 
@@ -219,7 +219,7 @@ Ursus Definition get_simple_forward_fee(cells:int256)(bits:int256)(is_mc:bool):U
 {
     refine __return__.
 }
-return \\ tokens.
+return.
 Defined.
 Sync.
 
@@ -250,7 +250,7 @@ Ursus Definition equal_slice_bits(src:slice_)(owner:slice_) : UExpression bool f
 {
     refine __return__. 
 }
-return true.
+return.
 Defined.
 Sync.
 
@@ -259,7 +259,7 @@ Ursus Definition my_address : UExpression slice_ false.
 {
     refine __return__. 
 }
-return \\ parent.
+return.
 Defined.
 Sync.
 
@@ -268,7 +268,7 @@ Ursus Definition null  : UExpression int256 false.
 {
     refine __return__.
 }
-return \\ tokens.                                                               (* TODO *)
+return.                                                               (* TODO *)
 Defined.
 Sync.
 
@@ -281,24 +281,25 @@ return.
 Defined.
 Sync.
 
+
 Ursus Definition create_wallet_data (owner:builder_)(parent:slice_) : UExpression cell_ true.
 {
-       (* begin_cell() *)
+(* return begin_cell()
+        .store_builder(owner)
+        .store_slice(parent)
+        .store_coins(0) ;; tokens
+        .store_dict(null()) ;; staking
+        .store_coins(0) ;; unstaking
+        .end_cell(); TODO *)
      ::// var0 ret : builder_ (* cell_ *) ; _ | .
-       (*  .store_builder(owner) *)
      ::// ret -> store(owner) .
-       (*  .store_slice(parent) *)
      ::// ret -> store (parent) .
-       (*  .store_coins(0) ;; tokens *)
      ::// ret -> store ({0:uint256} ) .
-        (* .store_dict(null()) ;; staking *)
      ::// ret -> store ( null() ) .
-        (* .store_coins(0) ;; unstaking *)
      ::// ret -> store ({0:uint256} ) .
-       (* .end_cell(); *) 
     refine __return__.
 }    
-return \\ staking .
+return .
 Defined.
 Sync.
 
@@ -324,13 +325,13 @@ Sync.
 
 Ursus Definition create_address (wc:int256)(addr:int256) : UExpression builder_ true.
 {
-       (* begin_cell() *)
+(* return begin_cell()
+        .store_uint(4, 3) ;; 100
+        .store_int(wc, 8)
+        .store_uint(addr, 256); *)
      ::// var0 ret : builder_ (* cell_ *) ; _ | .
-       (*  .store_uint(4, 3) ;; 100 *)
      ::// ret -> store({4:uint256} , {3:uint256} ) .
-       (*  .store_int(wc, 8) *)
-     ::// ret -> store (wc ,{8:uint256} ) .
-       (*  .store_uint(addr, 256); *)
+      ::// ret -> store (wc ,{8:uint256} ) .
      ::// ret -> store (addr , {256:uint256} ) .
 
     refine __return__.
@@ -371,7 +372,7 @@ Ursus Definition create_wallet_address (owner:builder_)(parent:slice_)(wallet_co
     ::// var0 wallet : builder_ := create_address( chain_base , addr );_|.
     refine __return__.
 }
-return (* (wallet, state_init, addr); *) .
+return (* (wallet, state_init, addr); *) . (* TODO *)
 Defined.
 Sync.
 
@@ -647,7 +648,7 @@ Sync.
     ::// require_ (equal_slice_bits(src, parent)  , err_access_denied ) ; _ | .
     (* ( slice v, int f? ) = staking.udict_get?(32, round_since); *)
     :://var0 ( v:slice_, f:int256 ) := udict_get(staking , {32%Z}, round_since);_|.
-    ::// if (f == {0%Z}) then { ->> } .
+    ::// if (f ) then { ->> } .
     {
         (* coins += v~load_coins(); *)
         ::// coins += {} (* v -> load (int256) *) | . (* TODO *)
@@ -705,6 +706,7 @@ Sync.
 (*    ::// var0 ( recipient_wc , _ ) := parse_std_addr(slice) ;_|. *)
     ::// var ( recipient_wc:int256, tmp:int256 ) := parse_std_addr(recipient);_|.
 
+    (* ( builder wallet, builder state_init, _ ) = create_wallet_address(recipient.to_builder(), parent, my_code()); *)
     ::// var0 ( wallet:builder_ , state_init:builder_ , tmp1:uint256 ) (* TODO *)
          := {} (* create_wallet_address( {} (* recipient.to_builder() *), parent, {} (* my_code() *) )  *) ;_|.
 
