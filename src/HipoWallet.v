@@ -739,7 +739,7 @@ Defined.
 Sync.
 
 #[write = s]
-Ursus Definition send_tokens(src:TvmSlice)(s:TvmSlice)(fwd_fee:int256):UExpression PhantomType true.
+Ursus Definition send_tokens (src:TvmSlice) (s:TvmSlice) (fwd_fee:int256): UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id: _ := s -> load(uint64); _ | . 
@@ -834,10 +834,9 @@ return.
 Defined.
 Sync.
 
-
-(* AL: not worwking from here *)
 (* () receive_tokens(slice src, slice s) impure inline { *)
-Ursus Definition receive_tokens(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+#[write = s]
+Ursus Definition receive_tokens (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_:=s -> load(uint64);_|. 
@@ -908,7 +907,9 @@ Defined.
 Sync.
 
 UseLocal Definition _ := [(optional (uint256 ** slice_));int32; (optional (int64 ** slice_)) ; (optional (int32 ** slice_)) ; (optional (int256 ** slice_))].
-  Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+
+#[write = s]
+Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_:=s -> load(int64);_|.
@@ -934,9 +935,9 @@ UseLocal Definition _ := [(optional (uint256 ** slice_));int32; (optional (int64
     ::// if(round_since) then { ->/> }.
     {
        (*  ( slice v, _ ) = ~udict_delete_get?(32, round_since); *)
-       ::// var0 (v:TvmCell , x:int256) := udict_delete_get(staking,{32%Z},round_since);_| .
+       ::// var0 (v:TvmCell , __: int256) := udict_delete_get(staking,{32%Z},round_since); _ |.
        (*  int staking_coins = v~load_coins(); *)
-       ::// var0 staking_coins:_:=s -> load(uint256);_|.
+       ::// var0 staking_coins: _ := s -> load(uint256);_|.
         (* v.end_parse(); *)
         ::// staking_coins -= coins.
         ::// if(staking_coins) then { ->/> } | .
@@ -970,6 +971,8 @@ Defined.
 Sync.
 
 UseLocal Definition _ := [slice_;option(TvmSlice ** TvmCell)].
+
+
 Ursus Definition isEmpty(s:option(TvmSlice ** TvmCell)):UExpression bool false.
 {
     refine __return__.
@@ -978,7 +981,8 @@ return.
 Defined.
 Sync.
 
-Ursus Definition unstake_tokens(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+#[write = s]
+Ursus Definition unstake_tokens (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_:=s -> load(int64);_|. 
@@ -1064,7 +1068,8 @@ return .
 Defined.
 Sync.
 
-  Ursus Definition rollback_unstake(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+#[write = s]
+Ursus Definition rollback_unstake(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_ := s -> load(int64);_| .
@@ -1093,7 +1098,8 @@ return .
 Defined.
 Sync.
 
-  Ursus Definition tokens_burned(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+#[write = s]
+Ursus Definition tokens_burned (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_ := s -> load(int64);_| .
@@ -1128,6 +1134,8 @@ return .
 Defined.
 Sync.
 
+
+(* AL: not working from here *)
 Ursus Definition unstake_all(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
