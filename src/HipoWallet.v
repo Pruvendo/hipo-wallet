@@ -43,11 +43,11 @@ Definition gas_tokens_burned        : int256 := 7179%Z
 Definition gas_send_tokens          : int256 := 10678%Z
 Definition gas_receive_tokens       : int256 := 11691%Z
 
-Definition gas_upgrade_wallet : int256       := 7618%Z
+Definition gas_upgrade_wallet       : int256 := 7618%Z
 Definition gas_proxy_migrate_wallet : int256 := 7978%Z
-Definition gas_migrate_wallet : int256       := 12802%Z
-Definition gas_proxy_merge_wallet : int256   := 7841%Z
-Definition gas_merge_wallet : int256         := 7443%Z
+Definition gas_migrate_wallet       : int256 := 12802%Z
+Definition gas_proxy_merge_wallet   : int256 := 7841%Z
+Definition gas_merge_wallet         : int256 := 7443%Z
 
 Definition op_receive_tokens        : int32  := 0x178d4519%Z
 Definition op_transfer_notification : int256 := 0x7362d09c%Z
