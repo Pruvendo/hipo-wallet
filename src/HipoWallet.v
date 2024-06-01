@@ -738,8 +738,8 @@ return.
 Defined.
 Sync.
 
-
-  Ursus Definition send_tokens(src:TvmSlice)(s:TvmSlice)(fwd_fee:int256):UExpression PhantomType true.
+#[write = s]
+Ursus Definition send_tokens(src:TvmSlice)(s:TvmSlice)(fwd_fee:int256):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id: _ := s -> load(uint64); _ | . 
@@ -801,7 +801,7 @@ Sync.
     throw_if(err_receiver_is_sender, equal_TvmSlicebits(recipient, owner)); (* ????????????????? *)
  *)
 
-   ::// require_ (  recipient_wc  ==  chain_base , err_only_basechain_allowed );_ | .
+   ::// require_ (recipient_wc  ==  chain_base , err_only_basechain_allowed );_ | .
    ::// require_ (equal_TvmSlicebits(src, owner) , err_access_denied ) ;_ | .
    ::// require_ (enough_fee  , err_insufficient_fee ) ;_ | .
    ::// require_ (amount <= tokens  , err_insufficient_funds ) ;_ | .
@@ -834,8 +834,10 @@ return.
 Defined.
 Sync.
 
+
+(* AL: not worwking from here *)
 (* () receive_tokens(slice src, slice s) impure inline { *)
-  Ursus Definition receive_tokens(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+Ursus Definition receive_tokens(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_:=s -> load(uint64);_|. 
