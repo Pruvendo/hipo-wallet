@@ -16,33 +16,32 @@ Inherits EverBaseContract ;
 Types ;
 Constants 
 
-Definition reserve_at_most : int256 := 2%Z
+Definition reserve_at_most  : int256 := 2%Z
+Definition chain_base       : int256 := 0%Z
+Definition unstake_auto     : int256 := 0%Z
+Definition unstake_best     : int256 := 2%Z
 
-Definition chain_base : int256 := 0%Z
-Definition unstake_auto : int256 := 0%Z
-Definition unstake_best : int256 := 2%Z
-
-Definition err_only_basechain_allowed : _NErrorType := 104
-Definition err_access_denied          : _NErrorType := 103
-Definition err_insufficient_funds     : _NErrorType := 102
 Definition err_insufficient_fee       : _NErrorType := 101
+Definition err_insufficient_funds     : _NErrorType := 102
+Definition err_access_denied          : _NErrorType := 103
+Definition err_only_basechain_allowed : _NErrorType := 104
 Definition err_receiver_is_sender     : _NErrorType := 105
+Definition err_invalid_op             : _NErrorType := 107
+Definition err_invalid_comment        : _NErrorType := 108
 Definition err_invalid_parameters     : _NErrorType := 109
-Definition err_invalid_comment        :  uint256    := 108
-Definition err_invalid_op             :  uint256    := 107
 
-Definition gas_unstake_tokens : int256       := 9040%Z 
+Definition gas_unstake_tokens       : int256 := 9040%Z 
 Definition gas_proxy_reserve_tokens : int256 := 6538%Z
-Definition gas_reserve_tokens : int256       := 15521%Z
-Definition gas_mint_bill : int256            := 7757%Z
-Definition gas_assign_bill : int256          := 5960%Z
-Definition gas_burn_bill : int256            := 6558%Z
-Definition gas_bill_burned : int256          := 12316%Z
-Definition gas_burn_tokens : int256          := 16627%Z
-Definition gas_proxy_tokens_burned : int256  := 7307%Z
-Definition gas_tokens_burned : int256        := 7179%Z 
-Definition gas_send_tokens : int256          := 10678%Z
-Definition gas_receive_tokens : int256       := 11691%Z
+Definition gas_reserve_tokens       : int256 := 15521%Z
+Definition gas_mint_bill            : int256 := 7757%Z
+Definition gas_assign_bill          : int256 := 5960%Z
+Definition gas_burn_bill            : int256 := 6558%Z
+Definition gas_bill_burned          : int256 := 12316%Z
+Definition gas_burn_tokens          : int256 := 16627%Z
+Definition gas_proxy_tokens_burned  : int256 := 7307%Z
+Definition gas_tokens_burned        : int256 := 7179%Z 
+Definition gas_send_tokens          : int256 := 10678%Z
+Definition gas_receive_tokens       : int256 := 11691%Z
 
 Definition gas_upgrade_wallet : int256       := 7618%Z
 Definition gas_proxy_migrate_wallet : int256 := 7978%Z
@@ -50,33 +49,33 @@ Definition gas_migrate_wallet : int256       := 12802%Z
 Definition gas_proxy_merge_wallet : int256   := 7841%Z
 Definition gas_merge_wallet : int256         := 7443%Z
 
-Definition op_receive_tokens : int32 := 0x178d4519%Z
+Definition op_receive_tokens        : int32  := 0x178d4519%Z
 Definition op_transfer_notification : int256 := 0x7362d09c%Z
-Definition op_proxy_reserve_tokens : int32 := 0x688b0213%Z
-Definition op_gas_excess : int256 := 0xd53276db%Z
-Definition op_unstake_tokens : int32 := 0x595f07bc%Z
-Definition op_proxy_migrate_wallet : int32 := 0x0cb246bb%Z
-Definition op_send_tokens : int32 := 0x0f8a7ea5%Z
-Definition op_tokens_minted : int32 := 0x5445efee%Z
-Definition op_save_coins : int32 := 0x4cce0e74%Z
-Definition op_rollback_unstake : int32 := 0x1b77fd1a%Z
-Definition op_tokens_burned : int32 := 0x5b512e25%Z
-Definition op_unstake_all : int32 := 0x5ae30148%Z
-Definition op_upgrade_wallet : int32 := 0x01d9ae1c%Z
-Definition op_merge_wallet : int32 := 0x63d3a76c%Z
-Definition op_withdraw_surplus : int32 := 0x23355ffb%Z
-Definition op_withdraw_jettons : int32 := 0x768a50b2%Z
-Definition op_top_up : int32 := 0x5372158c%Z
+Definition op_proxy_reserve_tokens  : int32  := 0x688b0213%Z
+Definition op_gas_excess            : int256 := 0xd53276db%Z
+Definition op_unstake_tokens        : int32  := 0x595f07bc%Z
+Definition op_proxy_migrate_wallet  : int32  := 0x0cb246bb%Z
+Definition op_send_tokens           : int32  := 0x0f8a7ea5%Z
+Definition op_tokens_minted         : int32  := 0x5445efee%Z
+Definition op_save_coins            : int32  := 0x4cce0e74%Z
+Definition op_rollback_unstake      : int32  := 0x1b77fd1a%Z
+Definition op_tokens_burned         : int32  := 0x5b512e25%Z
+Definition op_unstake_all           : int32  := 0x5ae30148%Z
+Definition op_upgrade_wallet        : int32  := 0x01d9ae1c%Z
+Definition op_merge_wallet          : int32  := 0x63d3a76c%Z
+Definition op_withdraw_surplus      : int32  := 0x23355ffb%Z
+Definition op_withdraw_jettons      : int32  := 0x768a50b2%Z
+Definition op_top_up                : int32  := 0x5372158c%Z
 
-Definition send_remaining_value : int256 := 64%Z
-Definition send_bounce_if_failed : int256 := 16%Z
-Definition send_pay_gas_separately : int256 := 1%Z
-Definition send_unreserved_balance: int256 := 28%Z
-Definition send_ignore_errors : int256 := 2%Z
+Definition send_remaining_value     : int256 := 64%Z
+Definition send_bounce_if_failed    : int256 := 16%Z
+Definition send_pay_gas_separately  : int256 := 1%Z
+Definition send_unreserved_balance  : int256 := 28%Z
+Definition send_ignore_errors       : int256 := 2%Z
 ;
 
 Record Contract := {
-tmp_tuple:(TvmBuilder ** TvmBuilder ** int) ;
+    (* tmp_tuple:(TvmBuilder ** TvmBuilder ** int) ; *)
     owner: TvmSlice;
     parent: TvmSlice (* TvmSlice *);
     tokens: int256;
@@ -93,28 +92,30 @@ UseLocal Definition _ := [ TvmBuilder ;
                            address ; 
                            int256 ;
                            uint256 ;
-                          int64 ;
-                          uint64 ;
-                          bool; (TvmSlice ** TvmCell);
+                           int64 ;
+                           uint64 ;
+                           bool; 
+                           (TvmSlice ** TvmCell);
                            TvmCell ; 
                            TvmSlice ; 
                            (optional (TvmCell ** TvmSlice));
                            (optional (address ** TvmSlice));
-PhantomType;     (int256 ** int256 ** int256 ** int256); (uint256 ** uint256);
-(int256 ** int256 ** int256); (TvmCell ** int256); N;
+                           (int256 ** int256 ** int256 ** int256); 
+                           (uint256 ** uint256);
+                           (int256 ** int256 ** int256); 
+                           (TvmCell ** int256); 
+                           (* N; *)
                            (TvmBuilder ** TvmBuilder ** int256) ;
                            (optional (int256 ** TvmSlice)) ].
 
 (* builder to_builder(slice s) inline {
     return begin_cell().store_slice(s);
 } *)
-#[returns=_ret]
+#[returns = b]
 Ursus Definition to_builder(s:TvmSlice): UExpression TvmBuilder true.
 {
-  ::// var0 q:TvmBuilder;_|.
-  ::// q -> store(s) .
-  ::// _ret := q.
-refine __return__.
+    ::// b -> store(s) .
+    refine __return__.
 }
 return.
 Defined.
@@ -122,9 +123,9 @@ Sync.
 
 
 (* () send_raw_message(cell msg, int mode) impure asm "SENDRAWMSG"; *)
-Ursus Definition send_raw_message (msg:TvmCell)(mode:int256): UExpression PhantomType false.
+Ursus Definition send_raw_message (msg:TvmCell) (mode:int256): UExpression PhantomType false.
 {
-refine __return__.
+    refine __return__.
 }
 return.
 Defined.
@@ -269,7 +270,7 @@ Defined.
 Sync.
 
 (* int send_tokens_fee() { *)
-#[returns=ret]
+#[returns=_ret]
 Ursus Definition send_tokens_fee : UExpression int256 false.
 {
     (* int storage_fee = wallet_storage_fee(); *)
@@ -281,7 +282,7 @@ Ursus Definition send_tokens_fee : UExpression int256 false.
     (* int forward_fee = get_simple_forward_fee(1 + 1, 267 + 267 + 4 + 1 + 4, false); *)
     ::// var0 forward_fee:_:= get_simple_forward_fee({1%Z} + {1%Z}, {267%Z} + {267%Z} + {4%Z} + {1%Z} + {4%Z}, {false});_|.
     (* return storage_fee + compute_fee + forward_fee; *)
-    ::// ret := storage_fee + compute_fee + forward_fee .
+    ::// _ret := storage_fee + compute_fee + forward_fee .
 
     refine __return__.
 
@@ -345,13 +346,13 @@ Ursus Definition create_wallet_data (owner:TvmBuilder)(parent:TvmSlice) : UExpre
         .store_dict(null()) ;; staking
         .store_coins(0) ;; unstaking
         .end_cell(); *)
-     ::// var0 ret : TvmBuilder (* TvmCell *) ; _ | .
-     ::// ret -> store(owner) .
-     ::// ret -> store (parent) .
-     ::// ret -> store ({0:uint256} ) .
-     ::// ret -> store ( null() ) .
-     ::// ret -> store ({0:uint256} ) .
-     ::// _result := ret -> toCell ().
+     ::// var0 b : TvmBuilder ; _ | .
+     ::// b -> store(owner) .
+     ::// b -> store (parent) .
+     ::// b -> store ({0:uint256} ) .
+     ::// b -> store ( null() ) .
+     ::// b -> store ({0:uint256} ) .
+     ::// _result := b -> toCell ().
     refine __return__.
 }    
 return .
@@ -359,18 +360,16 @@ Defined.
 Sync.
 
 (* builder create_state_init(cell code, cell data) inline { *)
-#[returns=_result]
+#[returns = b]
 Ursus Definition create_state_init (code:TvmCell)(data:TvmCell) : UExpression TvmBuilder true.
 {
 (* return begin_cell()
         .store_uint(6, 5) ;; 00110
         .store_ref(code)
         .store_ref(data); *)
-     ::// var0 ret : TvmBuilder ; _ | .
-     ::// ret -> store({6:uint256}  , {5:uint256}  ) .
-      ::// ret -> store (code) .
-     ::// ret -> store (data) .
-     ::// _result := ret .    
+     ::// b -> store({6:uint256}  , {5:uint256}  ) .
+     ::// b -> store (code) .
+     ::// b -> store (data) .
      refine __return__.
 }
 return .
@@ -378,18 +377,16 @@ Defined.
 Sync.
 
 (* builder create_address(int wc, int addr) inline_ref { *)
-#[returns=_result]
+#[returns=b]
 Ursus Definition create_address (wc:int256)(addr:int256) : UExpression TvmBuilder true.
 {
 (* return begin_cell()
         .store_uint(4, 3) ;; 100
         .store_int(wc, 8)
         .store_uint(addr, 256); *)
-     ::// var0 ret : TvmBuilder ; _ | .
-     ::// ret -> store({4:uint256} , {3:uint256} ) .
-     ::// ret -> store (wc ,{8:uint256} ) .
-     ::// ret -> store (addr , {256:uint256} ) .
-     ::// _result := ret . 
+     ::// b -> store({4:uint256} , {3:uint256} ) .
+     ::// b -> store (wc , {8%Z:int256} ) .
+     ::// b -> store (addr , {256:uint256} ) .
     refine __return__.
 }
 return .
@@ -397,13 +394,15 @@ Defined.
 Sync.
 
 (* cell end_cell(builder b) asm "ENDC"; *)
-Ursus Definition end_cell (b:TvmBuilder) : UExpression TvmCell false.
+(* Ursus Definition end_cell (b:TvmBuilder) : UExpression TvmCell false.
 {
     refine __return__.
 }
 return .
 Defined.
-Sync.
+Sync. *)
+
+Check tvm_hash.
 
 (* int TvmCellhash(cell c) asm "HASHCU"; *)
 Ursus Definition TvmCellhash (b:TvmCell) : UExpression int256 false.
@@ -435,12 +434,14 @@ return .
 Defined.
 Sync.
 
+Locate "tvm->code".
+
 (* cell my_code() asm "MYCODE"; *)
 Ursus Definition my_code : UExpression TvmCell false .
 {
     refine __return__.
 }
-return .
+return \\ tvm->code () \\.
 Defined.
 Sync.
 
@@ -485,21 +486,21 @@ Ursus Definition unstake_tokens_fee:UExpression int256 false.
 {
     (* int compute_gas = *)
     ::// var0 compute_gas:int256 :=  
-gas_unstake_tokens +
- gas_proxy_reserve_tokens +
- gas_reserve_tokens +
- gas_mint_bill +
- gas_assign_bill +
- gas_burn_bill +
- gas_bill_burned +
- gas_burn_tokens +
- gas_mint_bill +   
- gas_assign_bill + 
- gas_burn_bill +   
- gas_bill_burned + 
- gas_burn_tokens + 
- gas_proxy_tokens_burned +
- gas_tokens_burned ;_|.
+    gas_unstake_tokens +
+    gas_proxy_reserve_tokens +
+    gas_reserve_tokens +
+    gas_mint_bill +
+    gas_assign_bill +
+    gas_burn_bill +
+    gas_bill_burned +
+    gas_burn_tokens +
+    gas_mint_bill +   
+    gas_assign_bill + 
+    gas_burn_bill +   
+    gas_bill_burned + 
+    gas_burn_tokens + 
+    gas_proxy_tokens_burned +
+    gas_tokens_burned ;_|.
     (* int compute_fee = get_compute_fee(compute_gas, false); *)
     ::// var0 compute_fee:_:= get_compute_fee(compute_gas, {false}); _| .
 
@@ -569,13 +570,16 @@ return.
 Defined.
 Sync.
 
-Ursus Definition throw(src:uint256):UExpression PhantomType false.
+Locate "revert".
+
+(* Ursus Definition throw(src:uint256):UExpression PhantomType true.
 {
-refine __return__.
+    refine // require_ ({false}, {src: }).
+    refine __return__.
 }
 return .
-Defined.
-Sync.
+Defined. 
+Sync.*)
 
 (* slice skip_bits(slice s, int len) asm "SDSKIPFIRST"; *)
 Ursus Definition skip_bits(x:int256):UExpression TvmSlice false.
@@ -604,8 +608,10 @@ return .
 Defined.
 Sync.
 
+Locate "first".
+
 (* forall X, Y -> X pair_first([X, Y] p) *)
-#[returns=ret]
+(* #[returns=ret]
 Ursus Definition pair_first(x:(int256 ** TvmCell)) : UExpression int256 false.
 {
   ::// var0 (f:int256 , s:TvmCell) := x;_|.
@@ -614,7 +620,7 @@ refine __return__.
 }
 return .
 Defined.
-Sync.
+Sync. *)
 
 (*******************************************************************************)
 
@@ -652,6 +658,20 @@ return.
 Defined.
 Sync. 
 
+#[returns = addr_slice]
+Ursus Definition load_msg_addr (s: ULValue TvmSlice): UExpression TvmSlice true.
+{
+    ::// var0 a : address := s -> load (address) ; _ | .
+    ::// var0 b : TvmBuilder; _ |.
+    ::// b -> store (a) ; _ |.
+    ::// addr_slice := b -> toCell() -> toSlice () .
+    refine __return__.
+}
+return.
+Defined.
+Sync.
+
+
 (* () load_data() impure inline_ref {
     slice ds = get_data().begin_parse();
     owner = ds~load_msg_addr();
@@ -662,20 +682,14 @@ Sync.
     ds.end_parse();
 } *)
 
-  Ursus Definition load_data : UExpression PhantomType true.
+Ursus Definition load_data : UExpression PhantomType true.
 {
     (* slice ds = get_data().begin_parse(); *)
     ::// var0 ds: TvmSlice  := tvm_get_data () -> toSlice(); _ | .
     (* owner = ds~load_msg_addr(); *)
-    ::// var0 owner_address : address := ds -> load (address) ; _ | .
-    ::// var0 owner_builder : TvmBuilder; _ |.
-    ::// owner_builder -> store (owner_address) ; _ |.
-    ::// owner := owner_builder -> toCell() -> toSlice () .
+    ::// owner := load_msg_addr (ds).
     (* parent = ds~load_msg_addr(); *)
-    ::// var0 parent_address : address := ds -> load (address) ; _ | .
-    ::// var0 parent_builder : TvmBuilder; _ |.
-    ::// parent_builder -> store (parent_address) ; _ |.
-    ::// parent := parent_builder -> toCell() -> toSlice () .
+    ::// parent := load_msg_addr (ds) .
     (* tokens = ds~load_coins(); *)
     ::// tokens := ds -> load (int256).
     (* staking = ds~load_dict(); *)
@@ -690,19 +704,17 @@ Sync.
 
 UseLocal Definition _ := [uint64; (optional (uint64 ** TvmSlice)); uint32; (optional (uint32 ** slice_))].
 
-  Ursus Definition save_coins(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+#[write = s]
+Ursus Definition save_coins (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
-    ::// var0 query_id:uint64:=s -> load(uint64);_|. 
+    ::// var0 query_id:uint64 := s -> load(uint64);_|. 
     (* int coins = s~load_coins(); *)
-    ::// var0 coins:_:=s -> load(int256);_|.
+    ::// var0 coins: _ := s -> load(int256);_|.
     (* s~load_msg_addr(); ;; skip owner address *)
-    ::// var0 xxx : address := s -> load (address) ; _ | .
-    ::// var0 yyy : TvmBuilder; _ |.
-    ::// yyy -> store (xxx) ; _ |.
-    ::// var0 zzz :_:= yyy -> toCell() -> toSlice () ; _ | .
+    ::// var0 ___ : _ := load_msg_addr (s) ; _ | .
     (* int round_since = s~load_uint(32); *)
-    ::// var0 round_since:_:=s -> load(uint32);_|. 
+    ::// var0 round_since : _ := s -> load(uint32);_|. 
     (* s.end_parse(); *)
 
     (* throw_unless(err_access_denied, equal_TvmSlicebits(src, parent)); *)
@@ -774,7 +786,7 @@ Sync.
          := create_wallet_address( to_builder(recipient) , parent, my_code() ) ;_|.
 
     (* int incoming_ton = get_incoming_value().pair_first(); *)
-    ::// var0 incoming_ton:int256:= pair_first ( get_incoming_value() ); _ | . 
+    ::// var0 incoming_ton:int256:= first ( get_incoming_value() ); _ | . 
 
     (* int fee = send_tokens_fee() + forward_ton_amount + (forward_ton_amount ? 2 : 1) ** fwd_fee; *) 
     ::// var0 fee:int256:= send_tokens_fee() + forward_ton_amount + ((forward_ton_amount == {0%Z} ) ? {2%Z} : {1%Z}) * fwd_fee ;_|.
@@ -991,7 +1003,7 @@ Ursus Definition unstake_tokens(src:TvmSlice)(s:TvmSlice):UExpression PhantomTyp
     ::// if (! isEmpty (custom_payload) ) then { ->/> } . 
       {
         (* slice ss = custom_payload.begin_parse(); *)
-        ::// var0 ss: TvmSlice := {} (* custom_payload -> toSlice() *) ; _ | .  (* TODO : many difficult types...*)
+        ::// var0 ss: TvmSlice := s ; _ | .
         (* mode = ss~load_uint(4); *)
         ::// mode := ss -> load(int256) . (* TODO : what is 4 ? *)
 
@@ -1001,7 +1013,7 @@ Ursus Definition unstake_tokens(src:TvmSlice)(s:TvmSlice):UExpression PhantomTyp
     }
 
     (* int incoming_ton = get_incoming_value().pair_first(); *)
-    ::// var0 incoming_ton:int256 := pair_first ( get_incoming_value() );_|.
+    ::// var0 incoming_ton:int256 := first ( get_incoming_value() );_|.
 
     (* int fee = unstake_tokens_fee() + ownership_assigned_amount; *)
     ::// var0 fee:int256 := unstake_tokens_fee() + ownership_assigned_amount;_|.
@@ -1147,7 +1159,7 @@ Sync.
     (* s.end_parse(); *)
 
     (* int incoming_ton = get_incoming_value().pair_first(); *)
-    ::// var0 incoming_ton : int256 := pair_first( get_incoming_value() );_|.
+    ::// var0 incoming_ton : int256 := first( get_incoming_value() );_|.
 
     ::// var0 fee:_ := upgrade_wallet_fee();_|.
     (* int fee = upgrade_wallet_fee(); *)
@@ -1212,7 +1224,7 @@ Defined.
 Sync.
 
 
-  Ursus Definition withdraw_surplus(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+Ursus Definition withdraw_surplus(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_ := s -> load(int64);_| .
@@ -1242,14 +1254,14 @@ Sync.
         (* .store_uint(query_id, 64); *)
     ::// excess -> store (query_id , {64:uint256} ) .
     ::// send_msg({false}, to_builder(return_excess) , nullB(), excess, {0%Z}, send_unreserved_balance + send_ignore_errors).
-    ::// throw({0}) .
+    ::// revert_ ({0}) .
 refine __return__.
 }
 return .
 Defined.
 Sync.
 
-  Ursus Definition withdraw_jettons(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+Ursus Definition withdraw_jettons(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_ := s -> load(int64);_| .
@@ -1287,14 +1299,14 @@ Sync.
     ::// send' -> store ({false} , {1:uint256}) .
     ::// send_msg({true}, to_builder(child_wallet), nullB(), send' , {0%Z}, send_remaining_value).
 
-    ::// throw({0}).
+    ::// revert_ ({0}).
 refine __return__.
 }
 return .
 Defined.
 Sync.
 
-  Ursus Definition on_bounce(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+Ursus Definition on_bounce(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
 {
     (* s~load_uint(32); *)
     ::// var0 xxx:_ := s -> load(int32);_| .
@@ -1347,7 +1359,7 @@ Sync.
 
 UseLocal Definition _ := [uint16].
 
-  Ursus Definition route_internal_message(flags:int256)(src:TvmSlice)(s:TvmSlice)(cs:TvmSlice):UExpression PhantomType true.
+Ursus Definition route_internal_message(flags:int256)(src:TvmSlice)(s:TvmSlice)(cs:TvmSlice):UExpression PhantomType true.
 {
     (* if flags & 1 { *)
     ::// if(flags && {1%Z}) then { ->/> } . 
@@ -1464,9 +1476,9 @@ UseLocal Definition _ := [uint16].
     (* if op == op::top_up {
         throw(0); ;; top up TON balance, do nothing
     } *)
-    ::// if(op == op_top_up ) then { ->> } .
+    ::// if(op == op_top_up ) then { ->/> } .
     {
-        ::// throw({0}) |. 
+        ::// revert_({0}) | . 
     }
 
     ::// if(op == {0%Z} ) then { ->/> } .
@@ -1487,17 +1499,17 @@ UseLocal Definition _ := [uint16].
              ::// exit_ unstake_all(src, bnul -> toCell() -> toSlice() (* "0000000000000000"s *)) | . (* TODO *)
         }
 
-        ::// throw( err_invalid_comment ) | .
+        ::// require_ ( {false}, err_invalid_comment ) | .
     }
 
-    ::// throw( err_invalid_op ) .
+    ::// require_( {false}, err_invalid_op ) .
 refine __return__.
 }
 return .
 Defined.
 Sync.
 
-  Ursus Definition recv_internal(in_msg_full:TvmCell)(s:TvmSlice):UExpression PhantomType true.
+Ursus Definition recv_internal(in_msg_full:TvmCell)(s:TvmSlice):UExpression PhantomType true.
 {
     (* slice cs = in_msg_full.begin_parse(); *) 
     ::// var0 cs: TvmSlice := in_msg_full -> toSlice() ; _ | .  
