@@ -712,7 +712,7 @@ Ursus Definition save_coins (src:TvmSlice) (s:TvmSlice): UExpression PhantomType
     (* int coins = s~load_coins(); *)
     ::// var0 coins: _ := s -> load(int256);_|.
     (* s~load_msg_addr(); ;; skip owner address *)
-    ::// var0 ___ : _ := load_msg_addr (s) ; _ | .
+    ::// var0 __ : _ := load_msg_addr (s) ; _ | .
     (* int round_since = s~load_uint(32); *)
     ::// var0 round_since : _ := s -> load(uint32);_|. 
     (* s.end_parse(); *)
@@ -745,7 +745,7 @@ Ursus Definition send_tokens (src:TvmSlice) (s:TvmSlice) (fwd_fee:int256): UExpr
     ::// var0 query_id: _ := s -> load(uint64); _ | . 
     (* int amount = s~load_coins(); *)
     ::// var0 amount: _ := s -> load(int256);_ | . 
-   (*  slice recipient = s~load_msg_addr(); *)    
+    (*  slice recipient = s~load_msg_addr(); *)    
     ::// var0 recipient_address : address := s -> load (address) ; _ | .
     ::// var0 recipient_builder : TvmBuilder; _ |.
     ::// recipient_builder -> store (recipient_address) ; _ |.
@@ -1136,7 +1136,7 @@ Sync.
 
 
 (* AL: not working from here *)
-Ursus Definition unstake_all(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
+Ursus Definition unstake_all (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
     ::// var0 query_id:_ := s -> load(int64 );_| .
