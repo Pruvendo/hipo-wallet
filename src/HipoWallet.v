@@ -577,7 +577,7 @@ Ursus Definition create_wallet_address (owner:TvmBuilder)(parent:TvmSlice)(walle
     (* builder state_init = create_state_init(wallet_code, wallet_data);  *)
     ::// var0 state_init:TvmBuilder := create_state_init(wallet_code, wallet_data); _ | .
     (* int addr = state_init.end_cell().TvmCellhash(); *)
-    ::// var0 addr:int256 := TvmCellhash(state_init -> toCell())  ;_|.                          
+    ::// var0 addr:int256 := TvmCellhash(state_init -> toCell())  ;_|.
     (* builder wallet = create_address(chain::base, addr); *)
     ::// var0 wallet : TvmBuilder := create_address( chain_base , addr );_|.
     (* return (wallet, state_init, addr); *)
@@ -585,7 +585,7 @@ Ursus Definition create_wallet_address (owner:TvmBuilder)(parent:TvmSlice)(walle
     refine __return__.
 }
 return .
-Defined.
+Defined. (* Qed = 87 , refl = 98, Qed = 72 *)
 Sync.
 
 #[returns=ret]
@@ -657,7 +657,7 @@ Ursus Definition unstake_tokens_fee:UExpression int256 false.
     refine __return__.
 }
 return .
-Defined.
+Defined. (* Qed = 377.844 *)
 Sync.
 
 #[returns=ret]
@@ -691,7 +691,7 @@ Ursus Definition upgrade_wallet_fee:UExpression int256 false.
 refine __return__.
 }
 return.
-Defined.
+Defined. (* Qed = 77 *)
 Sync.
 
 (* forall X, Y -> X pair_first([X, Y] p) *)
@@ -773,7 +773,7 @@ Ursus Definition load_data : UExpression PhantomType true.
     refine __return__.
 }
 return.
-Defined.
+Defined. (* Qed = INF *)
 Sync.
 
 (* () save_coins(slice src, slice s) impure inline { *)
@@ -857,7 +857,7 @@ Ursus Definition send_tokens (src:TvmSlice) (s:TvmSlice) (fwd_fee:int256): UExpr
     (* int incoming_ton = get_incoming_value().pair_first(); *)
     ::// var0 incoming_ton:int256:= first ( get_incoming_value() ); _ | . 
 
-    (* int fee = send_tokens_fee() + forward_ton_amount + (forward_ton_amount ? 2 : 1) ** fwd_fee; *) 
+    (* int fee = send_tokens_fee() + forward_ton_amount + (forward_ton_amount ? 2 : 1) * fwd_fee; *) 
     ::// var0 fee:int256:= send_tokens_fee() + forward_ton_amount + ((forward_ton_amount == {0%Z} ) ? {2%Z} : {1%Z}) * fwd_fee ;_|.
 
     (* int enough_fee? = incoming_ton >= fee; *)
@@ -867,7 +867,7 @@ Ursus Definition send_tokens (src:TvmSlice) (s:TvmSlice) (fwd_fee:int256): UExpr
 :://throw_unless(err_access_denied, equal_TvmSlicebits(src, owner)).
 :://throw_unless(err_insufficient_fee, enough_fee).
 :://throw_unless(err_insufficient_funds, amount <= tokens).
-:://throw_if(err_receiver_is_sender, equal_TvmSlicebits(recipient, owner)). (* ????????????????? *)
+:://throw_if(err_receiver_is_sender, equal_TvmSlicebits(recipient, owner)). 
 
 
   (*  ::// require_ (recipient_wc  ==  chain_base , err_only_basechain_allowed );_ | .
@@ -971,7 +971,7 @@ Ursus Definition receive_tokens (src:TvmSlice) (s:TvmSlice): UExpression Phantom
     refine __return__. 
 }
 return.
-Defined.
+Defined. (*  *)
 Sync.
 
 (* () tokens_minted(slice src, slice s) impure inline { *)
@@ -1390,7 +1390,7 @@ Ursus Definition withdraw_jettons(src:TvmSlice)(s:TvmSlice):UExpression PhantomT
 refine __return__.
 }
 return .
-Defined.
+Defined. (* Qed = 40 *)
 Sync.
 
 (* () on_bounce(slice src, slice s) impure inline { *)
@@ -1448,7 +1448,7 @@ Ursus Definition on_bounce(src:TvmSlice)(s:TvmSlice):UExpression PhantomType tru
 refine __return__.
 }
 return .
-Defined.
+Defined. (*Qed = INF *)
 Sync.
 
 (* () route_internal_message(int flags, slice src, slice s, slice cs) impure inline { *)
@@ -1676,7 +1676,6 @@ refine __return__.
 return . 
 Defined.
 Sync.
-
 
 EndContract Implements .
 GenerateLocalState 0 HipoWallet.
