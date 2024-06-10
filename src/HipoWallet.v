@@ -795,7 +795,7 @@ Ursus Definition save_coins (src:TvmSlice) (s:TvmSlice): UExpression PhantomType
     (* ( slice v, int f? ) = staking.udict_get?(32, round_since); *)
     :://var0 ( v:TvmSlice, f:int256 ) := udict_get(staking , {32%Z}, round_since);_|.
     (*  if f? { *)
-    ::// if (f ) then { ->/> } .
+    ::// if (f == {0%Z}) then { ->/> } . (* TODO == {0%Z} *)
     {
         (* coins += v~load_coins(); *)
         refine// coins += v -> load (int256) | . 
@@ -848,7 +848,7 @@ Ursus Definition send_tokens (src:TvmSlice) (s:TvmSlice) (fwd_fee:int256): UExpr
        { ::// return_excess := src | . }
 
 (*    ::// var0 ( recipient_wc , _ ) := parse_std_addr(slice) ;_|. *)
-    ::// var ( recipient_wc:int256, __:int256 ) := parse_std_addr(recipient);_|.
+    ::// var0 ( recipient_wc:int256, __:int256 ) := parse_std_addr(recipient);_|.
     (* ( builder wallet, builder state_init, _ ) = create_wallet_address(recipient.to_builder(), parent, my_code()); *)
 
     ::// var0 ( wallet:TvmBuilder , state_init:TvmBuilder , __:int256 ) 
@@ -936,7 +936,7 @@ Ursus Definition receive_tokens (src:TvmSlice) (s:TvmSlice): UExpression Phantom
     ::// tokens += amount.
 
 (*       if forward_ton_amount { *)
-    ::// if(forward_ton_amount) then { ->/> }.
+    ::// if(forward_ton_amount == {0%Z}) then { ->/> }.
        {
         (* builder notification = begin_cell() *)
          ::// var0 notification : TvmBuilder ; _ |.
@@ -997,7 +997,7 @@ Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType
     ::// tokens += amount .
 
     (* if round_since { *)
-    ::// if(round_since) then { ->/> }.
+    ::// if(round_since  == {0} ) then { ->/> }. (* TODO  == {0} *)
     {
        (*  ( slice v, _ ) = ~udict_delete_get?(32, round_since); *)
        ::// var0 (v:TvmCell , __: int256) := udict_delete_get(staking,{32%Z},round_since); _ |.
@@ -1007,7 +1007,7 @@ Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType
              staking_coins -= coins;*)
         ::// staking_coins -= coins.
         (*   if staking_coins { *)
-        ::// if(staking_coins) then { ->/> } | .
+        ::// if( staking_coins == {0} ) then { ->/> } | . (* TODO  == {0} *)
         {
            ::// var0 r:TvmBuilder;_|.
            ::// r -> store (coins) .
@@ -1456,7 +1456,7 @@ Sync.
 Ursus Definition route_internal_message(flags:int256)(src:TvmSlice)(s:TvmSlice)(cs:TvmSlice):UExpression PhantomType true.
 {
     (* if flags & 1 { *)
-    ::// if(flags && {1%Z}) then { ->/> } . 
+    ::// if(((flags&& {1%Z}) == {0%Z})) then { ->/> } . (* TODO == {0%Z} *)
     {    (* return on_bounce(src, s); *)
         ::// exit_ (on_bounce(src, s)) | .
     }
