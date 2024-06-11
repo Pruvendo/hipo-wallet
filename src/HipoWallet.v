@@ -795,7 +795,7 @@ Ursus Definition save_coins (src:TvmSlice) (s:TvmSlice): UExpression PhantomType
     (* ( slice v, int f? ) = staking.udict_get?(32, round_since); *)
     :://var0 ( v:TvmSlice, f:int256 ) := udict_get(staking , {32%Z}, round_since);_|.
     (*  if f? { *)
-    ::// if (f == {0%Z}) then { ->/> } . (* TODO == {0%Z} *)
+    ::// if (f != {0%Z}) then { ->/> } . (* TODO == {0%Z} *)
     {
         (* coins += v~load_coins(); *)
         refine// coins += v -> load (int256) | . 
@@ -858,7 +858,7 @@ Ursus Definition send_tokens (src:TvmSlice) (s:TvmSlice) (fwd_fee:int256): UExpr
     ::// var0 incoming_ton:int256:= first ( get_incoming_value() ); _ | . 
 
     (* int fee = send_tokens_fee() + forward_ton_amount + (forward_ton_amount ? 2 : 1) * fwd_fee; *) 
-    ::// var0 fee:int256:= send_tokens_fee() + forward_ton_amount + ((forward_ton_amount == {0%Z} ) ? {2%Z} : {1%Z}) * fwd_fee ;_|.
+    ::// var0 fee:int256:= send_tokens_fee() + forward_ton_amount + ((forward_ton_amount != {0%Z} ) ? {2%Z} : {1%Z}) * fwd_fee ;_|.
 
     (* int enough_fee? = incoming_ton >= fee; *)
     ::// var0 enough_fee:bool:= incoming_ton >= fee;_|.
@@ -936,7 +936,7 @@ Ursus Definition receive_tokens (src:TvmSlice) (s:TvmSlice): UExpression Phantom
     ::// tokens += amount.
 
 (*       if forward_ton_amount { *)
-    ::// if(forward_ton_amount == {0%Z}) then { ->/> }.
+    ::// if(forward_ton_amount != {0%Z}) then { ->/> }.
        {
         (* builder notification = begin_cell() *)
          ::// var0 notification : TvmBuilder ; _ |.
@@ -1456,7 +1456,7 @@ Sync.
 Ursus Definition route_internal_message(flags:int256)(src:TvmSlice)(s:TvmSlice)(cs:TvmSlice):UExpression PhantomType true.
 {
     (* if flags & 1 { *)
-    ::// if(((flags&& {1%Z}) == {0%Z})) then { ->/> } . (* TODO == {0%Z} *)
+    ::// if(((flags&& {1%Z}) != {0%Z})) then { ->/> } . (* TODO == {0%Z} *)
     {    (* return on_bounce(src, s); *)
         ::// exit_ (on_bounce(src, s)) | .
     }
@@ -1575,7 +1575,7 @@ Ursus Definition route_internal_message(flags:int256)(src:TvmSlice)(s:TvmSlice)(
 refine// throw( #{0:_NErrorType}) | .
     }
 
-    ::// if(op == {0%Z} ) then { ->/> } .
+    ::// if(op != {0%Z} ) then { ->/> } .
     {  (* int c = s~load_uint(8); *)
       ::// var0 c :_ := s -> load(int256 (* 8 *));_| .
         (* s.end_parse(); *)
