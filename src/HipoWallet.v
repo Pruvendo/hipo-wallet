@@ -8,7 +8,7 @@ Set UrsusPrefixTactic "PrefixTestOptimized".
 
 
 #[translation = off]
-#[quickchick = off]
+#[quickchick = on]
 #[language = func]
 Contract HipoWallet ;
 Sends To  ; 
@@ -1192,6 +1192,28 @@ Ursus Definition tokens_burned (src:TvmSlice) (s:TvmSlice): UExpression PhantomT
     ::// notification -> store (coins) .
     (*   send_msg(false, owner.to_builder(), null(), notification, coins, send::unreserved_balance + send::ignore_errors); *)
     ::// send_msg({false}, to_builder(owner), nullB(), notification, coins, send_unreserved_balance + send_ignore_errors). 
+refine __return__.
+}
+return .
+Defined.
+Sync.
+
+#[write = s]
+Ursus Definition tokens_burned_simplified (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
+{
+    (* int query_id = s~load_uint(64); *)
+    ::// var0 query_id:_ := s -> load(int64);_| .
+    (* int amount = s~load_coins(); *)
+    ::// var0 amount:_ := s -> load(int256);_ | .
+    (* int coins = s~load_coins(); *)
+    ::// var0 coins:_ := s -> load(int256);_ | .
+    (* s.end_parse(); *)
+
+    (* ::// require_ (equal_TvmSlicebits(src, parent) , err_access_denied );_| . *)
+
+    (*   unstaking -= amount; *)
+    ::// unstaking -= amount .
+ 
 refine __return__.
 }
 return .
