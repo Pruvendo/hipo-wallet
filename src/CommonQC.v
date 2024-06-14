@@ -26,11 +26,21 @@ Require Import UrsusTVM.Solidity.tvmFunc.
 Require Import UrsusTVM.Solidity.tvmNotations.
 Require Import UrsusTVM.Solidity.tvmCells.
 
+Require Import UrsusEnvironment.Solidity.current.Environment.
+
 From QuickChick Require Import QuickChick.
 Import QcDefaultNotation. Open Scope qc_scope.
 Set Warnings "-extraction-opaque-accessed,-extraction".
 
+Require Import Common.
+Require Import HipoWallet.
+Import HipoWallet.
+
+Import MonadNotation.
+Open Scope monad_scope.
+
 Require Import UrsusQC.CommonQCEnvironment.
+Require Import UrsusQC.VMStateGenerator.
 
 Extract Constant defNumTests => "10".
 
@@ -39,21 +49,60 @@ Instance IDefault_booleq : XBoolEquable bool IDefault := {
     eqb _ _ := true
 }.
 
-
-(* Import MonadNotation.
-Open Scope monad_scope.
-
 #[global]
-Instance Prod_gensized : Gen (prod nat nat) := {
-    arbitrary :=
-        a <- (arbitrary : G nat) ;;
-        b <- (arbitrary : G nat) ;;
-        if (a =? b)%nat then ret (a, b + 1) else ret (a, b)
+Instance Ledger_Shrink : Shrink (LedgerLRecord rec) := {
+    shrink l := Datatypes.nil : Datatypes.list (LedgerLRecord rec)
 }.
 
-Definition prop1 (p : nat * nat) : Prop := Nat.eqb (fst p) (snd p) = false.
+Notation " f '::>' g" := 
+    ((_ : EmbeddedType f (@field_type f _ _ g))) 
+    (at level 20, only parsing, left associativity).
+Notation "f ':>' g" := 
+    ((@TransEmbedded _ _ (@field_type _ _ _ g) f (_ : EmbeddedType _ (@field_type _ _ _ g)))) 
+    (at level 21, only parsing, left associativity).
 
-Require Import UrsusQC.ConvertPropToChecker.
+(* set *)
+Notation "r '<--' v 'with' et":= (@injEmbed _ _ et v r) (at level 22, only parsing).
 
-ConvertPropToChecker prop1.
-QuickCheck prop1_QC. *)
+(* get *)
+Notation "'-->' r 'with' et":= (@projEmbed _ _ et r) (at level 22, only parsing).
+
+Definition Contract := LedgerLRecord rec ::> Ledger_MainState. 
+Definition Parent := Contract :> _parent.
+Definition Owner := Contract :> _owner.
+Definition Unstaking := Contract :> _unstaking.
+Definition Tokens := Contract :> _tokens.
+
+Definition with_positive_int
+    {n : N}
+    (et : EmbeddedType (LedgerLRecord rec) (XBInteger n))
+    (l : LedgerLRecord rec) : G (LedgerLRecord rec) :=
+        let v := --> l with et in
+        let positive := if (xIntGeb v 0%Z) then v else (xIntMult ((-1)%Z : XBInteger n) v) in
+        ret (l <-- positive with et).
+
+Definition pack_address (addr : address) : TvmSlice :=
+    xMaybeMapDefault
+        builder_to_slice_
+        (builder_store_ (Wrap_TvmBuilder EmptyPrecell) addr)
+        default.
+
+Definition with_slice_address_sized
+    (et : EmbeddedType (LedgerLRecord rec) TvmSlice)
+    (size : nat)
+    (l : LedgerLRecord rec) : G (LedgerLRecord rec) :=
+        addr <- (arbitrarySized size : G address) ;;
+        let slice_address := pack_address addr in
+        ret (l <-- slice_address with et).
+
+Definition ledger_gen_sized (size : nat) : G (LedgerLRecord rec) :=
+    arbitrarySized size
+        >>= with_positive_int Unstaking
+        >>= with_positive_int Tokens
+        >>= with_slice_address_sized Parent size
+        >>= with_slice_address_sized Owner size.
+
+#[global]
+Instance Ledger_GenSized : GenSized (LedgerLRecord rec) := {
+    arbitrarySized size := ledger_gen_sized size
+}.
