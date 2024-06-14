@@ -81,11 +81,13 @@ Definition with_positive_int
         let positive := if (xIntGeb v 0%Z) then v else (xIntMult ((-1)%Z : XBInteger n) v) in
         ret (l <-- positive with et).
 
-Definition pack_address (addr : address) : TvmSlice :=
+Definition pack_slice (f : TvmBuilder -> option TvmBuilder) : TvmSlice :=
     xMaybeMapDefault
         builder_to_slice_
-        (builder_store_ (Wrap_TvmBuilder EmptyPrecell) addr)
+        (f (Wrap_TvmBuilder EmptyPrecell))
         default.
+
+Definition pack_address (addr : address) : TvmSlice := pack_slice (fun x => builder_store_ x addr).
 
 Definition with_slice_address_sized
     (et : EmbeddedType (LedgerLRecord rec) TvmSlice)

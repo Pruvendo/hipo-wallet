@@ -1,5 +1,7 @@
 Require Import UrsusEnvironment.Solidity.current.Environment.
 Require Import Common.
+Require Import CommonQC.
+Require Import UrsusQC.ConvertPropToChecker.
 Require Import HipoWallet.
 Import HipoWallet.
 
@@ -85,6 +87,10 @@ Definition TBO3_def
  condition (ExecGenDefs.isError (eval_state (Uinterpreter (tokens_burned rec def parent s)) l) = false).
  conclusion (unstaking' = xIntMinus unstaking amount).
 Defined.
+
+(* works *)
+(* ConvertPropToChecker TBO3_def.
+QuickCheck TBO3_def_QC. *)
 
 Definition UTO3_def
  (src:TvmSlice)(query_id: int64)

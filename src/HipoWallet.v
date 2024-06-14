@@ -314,8 +314,10 @@ Defined.
 Sync.
 
 (* int equal_TvmSlicebits(slice a, slice b) asm "SDEQ"; *)
+#[returns=ret]
 Ursus Definition equal_TvmSlicebits(src:TvmSlice)(owner:TvmSlice) : UExpression bool false.
 {
+    ::// ret := src == { owner }; _ |.
     refine __return__. 
 }
 return.
@@ -1210,7 +1212,7 @@ Ursus Definition tokens_burned_simplified (src:TvmSlice) (s:TvmSlice): UExpressi
     (* s.end_parse(); *)
 
     (* ::// require_ (equal_TvmSlicebits(src, parent) , err_access_denied );_| . *)
-
+    :://throw_unless(err_access_denied, equal_TvmSlicebits(src, parent)).
     (*   unstaking -= amount; *)
     ::// unstaking -= amount .
  
