@@ -242,13 +242,13 @@ Sync.
 
 (* (cell, slice, int) udict_delete_get?(cell dict, int key_len, int index) asm(index dict key_len) "DICTUDELGET" "NULLSWAPIFNOT"; *)
 #[returns=ret]
-Ursus Definition udict_delete_get(dict:TvmCell)(key_len:int256)(index:uint32): UExpression (TvmCell ** TvmSlice ** int256) true.
+Ursus Definition udict_delete_get(dict:TvmCell)(key_len:int256)(index:int256): UExpression (TvmCell ** TvmSlice ** int256) true.
 {
     ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
-    ::// var0 oldValue: TvmSlice := p[{index}]; _ |.
+    ::// var0 oldValue: TvmSlice := p[uint32!({index})]; _ |.
     ::// var0 successFlag : int256 := {0%Z}; _ |.
-    ::// if (p->exists({index})) then { successFlag := {(-1)%Z} }.
-    ::// p := p->delete({index}).
+    ::// if (p->exists(uint32!({index}))) then { successFlag := {(-1)%Z} }.
+    ::// p := p->delete(uint32!({index})).
     ::// var0 dict' : TvmBuilder; _ |.
     ::// dict'->store(p).
     ::// ret := [dict'->toCell(), oldValue, successFlag].
@@ -409,10 +409,10 @@ Sync.
 
 (* cell udict_set_builder(cell dict, int key_len, int index, builder value) asm(value index dict key_len) "DICTUSETB"; *)
 #[returns=ret]
-Ursus Definition udict_set_builder(dict:TvmCell)(key_len:int256)(index:uint32)(value:TvmBuilder):UExpression TvmCell true.
+Ursus Definition udict_set_builder(dict:TvmCell)(key_len:int256)(index:int256)(value:TvmBuilder):UExpression TvmCell true.
 {
     ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
-    ::// p[{index}] := {value}->toSlice().
+    ::// p[uint32!({index})] := {value}->toSlice().
     ::// var0 dict' : TvmBuilder; _ |.
     ::// dict'->store(p).
     ::// ret := dict'->toCell().
@@ -422,14 +422,14 @@ return.
 Defined.
 Sync.
 
-(* (slice, int) idict_get?(cell dict, int key_len, int index) asm(index dict key_len) "DICTIGET" "NULLSWAPIFNOT"; *)
+(* (slice, int) udict_get?(cell dict, int key_len, int index) asm(index dict key_len) "DICTUGET" "NULLSWAPIFNOT"; *)
 #[returns=ret]
-Ursus Definition udict_get(dict:TvmCell)(key_len:int256)(index:uint32):UExpression (TvmSlice ** int256) true.
+Ursus Definition udict_get(dict:TvmCell)(key_len:int256)(index:int256):UExpression (TvmSlice ** int256) true.
 {
     ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
-    ::// var0 res: TvmSlice := p[{index}]; _ |.
+    ::// var0 res: TvmSlice := p[uint32!({index})]; _ |.
     ::// var0 successFlag : int256 := {0%Z}; _ |.
-    ::// if (p->exists({index})) then { successFlag := {(-1)%Z} }.
+    ::// if (p->exists(uint32!({index}))) then { successFlag := {(-1)%Z} }.
     ::// ret := [res, successFlag].
     refine __return__.
 }
@@ -813,7 +813,7 @@ Ursus Definition save_coins (src:TvmSlice) (s:TvmSlice): UExpression PhantomType
     (* s~load_msg_addr(); ;; skip owner address *)
     ::// var0 __ : _ := load_msg_addr (s) ; _ | .
     (* int round_since = s~load_uint(32); *)
-    ::// var0 round_since : _ := s -> load(uint32);_|. 
+    ::// var0 round_since : int256 := int256(s -> load(uint32));_|. 
     (* s.end_parse(); *)
 
 ::// throw_unless(err_access_denied, equal_TvmSlicebits(src, parent)) .
@@ -1014,7 +1014,7 @@ Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType
     ::// var0 coins:_ := load_msg_addr(s);_|.
 
     (* int round_since = s~load_uint(32); *)
-    ::// var0 round_since:_:=s -> load(uint32);_|. 
+    ::// var0 round_since: int256 := int256(s -> load(uint32));_|. 
     (* s.end_parse(); *)
 
 :://throw_unless(err_access_denied, equal_TvmSlicebits(src, parent)).
@@ -1023,7 +1023,7 @@ Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType
     ::// tokens += amount .
 
     (* if round_since { *)
-    ::// if(round_since  == {0} ) then { ->/> }. (* TODO  == {0} *)
+    ::// if(round_since  == {0%Z} ) then { ->/> }. (* TODO  == {0} *)
     {
        (*  ( slice v, _ ) = ~udict_delete_get?(32, round_since); *)
        ::// var0 (v:TvmCell , __: _) := udict_delete_get(staking,{32%Z},round_since); _ |.
