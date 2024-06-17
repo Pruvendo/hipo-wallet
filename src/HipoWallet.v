@@ -110,7 +110,8 @@ UseLocal Definition _ := [
                            TvmCell ; 
                            TvmSlice ; 
  
-                           (TvmCell ** int256); 
+                           (TvmCell ** TvmSlice ** int256); 
+                           TvmSlice ** int256;
 
                            optional TvmBuilder; 
 
@@ -127,7 +128,9 @@ UseLocal Definition _ := [
                            (optional (TvmCell ** TvmSlice));
                            (optional (address ** TvmSlice));
                            (optional (TvmSlice ** TvmCell));
-                           (optional (int256 ** TvmSlice)) ].
+                           (optional (int256 ** TvmSlice));
+                           mapping uint32 TvmSlice;
+                           optional (mapping uint32 TvmSlice ** TvmSlice)].
 
 Locate "require_".
 
@@ -238,8 +241,17 @@ Defined.
 Sync.
 
 (* (cell, slice, int) udict_delete_get?(cell dict, int key_len, int index) asm(index dict key_len) "DICTUDELGET" "NULLSWAPIFNOT"; *)
-Ursus Definition udict_delete_get(dict:TvmCell)(key_len:int256)(index:uint32): UExpression (TvmCell ** int256) false.
+#[returns=ret]
+Ursus Definition udict_delete_get(dict:TvmCell)(key_len:int256)(index:uint32): UExpression (TvmCell ** TvmSlice ** int256) true.
 {
+    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
+    ::// var0 oldValue: TvmSlice := p[{index}]; _ |.
+    ::// var0 successFlag : int256 := {0%Z}; _ |.
+    ::// if (p->exists({index})) then { successFlag := {(-1)%Z} }.
+    ::// p := p->delete({index}).
+    ::// var0 dict' : TvmBuilder; _ |.
+    ::// dict'->store(p).
+    ::// ret := [dict'->toCell(), oldValue, successFlag].
     refine __return__.
 }
 return.
@@ -396,8 +408,14 @@ Defined.
 Sync.
 
 (* cell udict_set_builder(cell dict, int key_len, int index, builder value) asm(value index dict key_len) "DICTUSETB"; *)
-Ursus Definition udict_set_builder(z:TvmCell)(x:int256)(round_since:uint32)(y:TvmBuilder):UExpression TvmCell false.
+#[returns=ret]
+Ursus Definition udict_set_builder(dict:TvmCell)(key_len:int256)(index:uint32)(value:TvmBuilder):UExpression TvmCell true.
 {
+    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
+    ::// p[{index}] := {value}->toSlice().
+    ::// var0 dict' : TvmBuilder; _ |.
+    ::// dict'->store(p).
+    ::// ret := dict'->toCell().
     refine __return__.
 }
 return.
@@ -405,8 +423,14 @@ Defined.
 Sync.
 
 (* (slice, int) idict_get?(cell dict, int key_len, int index) asm(index dict key_len) "DICTIGET" "NULLSWAPIFNOT"; *)
-Ursus Definition udict_get(dict:TvmCell)(key_len:int256)(index:uint32):UExpression (TvmSlice ** int256) false.
+#[returns=ret]
+Ursus Definition udict_get(dict:TvmCell)(key_len:int256)(index:uint32):UExpression (TvmSlice ** int256) true.
 {
+    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
+    ::// var0 res: TvmSlice := p[{index}]; _ |.
+    ::// var0 successFlag : int256 := {0%Z}; _ |.
+    ::// if (p->exists({index})) then { successFlag := {(-1)%Z} }.
+    ::// ret := [res, successFlag].
     refine __return__.
 }
 return.
@@ -1002,9 +1026,9 @@ Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType
     ::// if(round_since  == {0} ) then { ->/> }. (* TODO  == {0} *)
     {
        (*  ( slice v, _ ) = ~udict_delete_get?(32, round_since); *)
-       ::// var0 (v:TvmCell , __: int256) := udict_delete_get(staking,{32%Z},round_since); _ |.
+       ::// var0 (v:TvmCell , __: _) := udict_delete_get(staking,{32%Z},round_since); _ |.
        (*  int staking_coins = v~load_coins(); *)
-       ::// var0 staking_coins: _ := s -> load(uint256);_|.
+       ::// var0 staking_coins: _ := v -> toSlice() -> loadR(uint256);_|.
         (* v.end_parse(); 
              staking_coins -= coins;*)
         ::// staking_coins -= coins.
@@ -1704,6 +1728,7 @@ Sync.
 EndContract Implements .
 GenerateLocalState 0 HipoWallet.
 GenerateLocalState 1 HipoWallet.
+Fail GenerateLocalState 2 HipoWallet.
 GenerateLocalState HipoWallet.
 
 
