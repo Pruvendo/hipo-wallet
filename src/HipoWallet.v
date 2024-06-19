@@ -4,6 +4,11 @@ Require Import UrsusQC.CommonQCEnvironment.
 Require Import UrsusContractCreator.UrsusFieldUtils.
 Require Import UrsusContractCreator.BaseContracts.EverContract.
 
+Require Import UrsusTVM.Solidity.tvmTypes.
+Require Import UrsusTVM.Solidity.tvmFunc.
+Require Import UrsusTVM.Solidity.tvmNotations.
+Require Import UrsusTVM.Solidity.tvmCells.
+
 Set UrsusPrefixTactic "PrefixTestOptimized".
 
 
@@ -129,8 +134,24 @@ UseLocal Definition _ := [
                            (optional (address ** TvmSlice));
                            (optional (TvmSlice ** TvmCell));
                            (optional (int256 ** TvmSlice));
+
+                           (optional (TvmSlice ** TvmCell)); 
+                           (optional (uint64 ** TvmCell)); 
+                           (optional (uint32 ** slice_));
+                           (optional (uint256 ** slice_));
+                           (optional (int64 ** slice_)) ; 
+                           (optional (int32 ** slice_)) ; 
+                           (optional (int256 ** slice_));
+                           (optional (TvmCell ** TvmSlice));
+                           (optional (address ** TvmCell));
+                           (optional (TvmSlice ** TvmCell));
+                           (optional (int256 ** TvmCell));
+
                            mapping uint32 TvmSlice;
-                           optional (mapping uint32 TvmSlice ** TvmSlice)].
+                           optional (mapping uint32 TvmCell ** TvmSlice);
+                           
+                           mapping uint32 TvmCell;
+                           optional (mapping uint32 TvmCell ** TvmSlice)].
 
 Locate "require_".
 
@@ -244,14 +265,14 @@ Sync.
 #[returns=ret]
 Ursus Definition udict_delete_get(dict:TvmCell)(key_len:int256)(index:int256): UExpression (TvmCell ** TvmSlice ** int256) true.
 {
-    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
-    ::// var0 oldValue: TvmSlice := p[uint32!({index})]; _ |.
+    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmCell); _ |.
+    ::// var0 oldValue: TvmCell := p[uint32!({index})]; _ |.
     ::// var0 successFlag : int256 := {0%Z}; _ |.
     ::// if (p->exists(uint32!({index}))) then { successFlag := {(-1)%Z} }.
     ::// p := p->delete(uint32!({index})).
     ::// var0 dict' : TvmBuilder; _ |.
     ::// dict'->store(p).
-    ::// ret := [dict'->toCell(), oldValue, successFlag].
+    ::// ret := [dict'->toCell(), oldValue->toSlice(), successFlag].
     refine __return__.
 }
 return.
@@ -411,10 +432,10 @@ Sync.
 #[returns=ret]
 Ursus Definition udict_set_builder(dict:TvmCell)(key_len:int256)(index:int256)(value:TvmBuilder):UExpression TvmCell true.
 {
-    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
-    ::// p[uint32!({index})] := {value}->toSlice().
+    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmCell); _ |.
+    ::// p[uint32!({index})] := TvmCell({value}).
     ::// var0 dict' : TvmBuilder; _ |.
-    ::// dict'->store(p).
+    ::// dict'->store (p) ; _ |.
     ::// ret := dict'->toCell().
     refine __return__.
 }
@@ -426,11 +447,11 @@ Sync.
 #[returns=ret]
 Ursus Definition udict_get(dict:TvmCell)(key_len:int256)(index:int256):UExpression (TvmSlice ** int256) true.
 {
-    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmSlice); _ |.
-    ::// var0 res: TvmSlice := p[uint32!({index})]; _ |.
+    ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmCell); _ |.
+    ::// var0 res: TvmCell := p[uint32!({index})]; _ |.
     ::// var0 successFlag : int256 := {0%Z}; _ |.
     ::// if (p->exists(uint32!({index}))) then { successFlag := {(-1)%Z} }.
-    ::// ret := [res, successFlag].
+    ::// ret := [res->toSlice(), successFlag].
     refine __return__.
 }
 return.
@@ -807,7 +828,7 @@ Sync.
 Ursus Definition save_coins (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
-    ::// var0 query_id:uint64 := s -> load(uint64);_|. 
+    ::// var0 query_id:_ := int256(s -> load(uint64));_|. 
     (* int coins = s~load_coins(); *)
     ::// var0 coins: _ := s -> load(int256);_|.
     (* s~load_msg_addr(); ;; skip owner address *)
@@ -1005,38 +1026,37 @@ Sync.
 Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
-    ::// var0 query_id:_:=s -> load(int64);_|.
+    ::// var0 query_id:_:=int256(s -> load(uint64));_|.
    (*  int amount = s~load_coins(); *)
     ::// var0 amount:_:=s -> load(int256);_|.
     (* int coins = s~load_coins(); *)
     ::// var0 coins:_:=s -> load(uint256);_|.
     (* s~load_msg_addr(); ;; skip owner address *) 
-    ::// var0 coins:_ := load_msg_addr(s);_|.
+    ::// load_msg_addr(s);_|.
 
     (* int round_since = s~load_uint(32); *)
     ::// var0 round_since: int256 := int256(s -> load(uint32));_|. 
     (* s.end_parse(); *)
-
 :://throw_unless(err_access_denied, equal_TvmSlicebits(src, parent)).
     (* ::// require_ (equal_TvmSlicebits(src, parent) , err_access_denied ) ;_|. *)
     (*   tokens += amount; *)
     ::// tokens += amount .
 
     (* if round_since { *)
-    ::// if(round_since  == {0%Z} ) then { ->/> }. (* TODO  == {0} *)
+    ::// if(round_since != {0%Z} ) then { ->/> }. (* TODO  == {0} *)
     {
        (*  ( slice v, _ ) = ~udict_delete_get?(32, round_since); *)
-       ::// var0 (v:TvmCell , __: _) := udict_delete_get(staking,{32%Z},round_since); _ |.
+       ::// var0 ( __ : _, v:TvmSlice , ___: _) := udict_delete_get(staking,{32%Z},round_since); _ |.
        (*  int staking_coins = v~load_coins(); *)
-       ::// var0 staking_coins: _ := v -> toSlice() -> loadR(uint256);_|.
+       ::// var0 staking_coins: _ := v  -> loadR(uint256); _ | .
         (* v.end_parse(); 
              staking_coins -= coins;*)
         ::// staking_coins -= coins.
         (*   if staking_coins { *)
-        ::// if( staking_coins == {0} ) then { ->/> } | . (* TODO  == {0} *)
+        ::// if( staking_coins != {0} ) then { ->/> } | . (* TODO  == {0} *)
         {
            ::// var0 r:TvmBuilder;_|.
-           ::// r -> store (coins) .
+           ::// r -> store (staking_coins) .
             (* staking~udict_set_builder(32, round_since, begin_cell().store_coins(staking_coins)); *)
            ::// udict_set_builder( staking , {32%Z} , round_since, r ) | .
         }
