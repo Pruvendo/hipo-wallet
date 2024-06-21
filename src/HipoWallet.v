@@ -433,10 +433,10 @@ Sync.
 Ursus Definition udict_set_builder(dict:TvmCell)(key_len:int256)(index:int256)(value:TvmBuilder):UExpression TvmCell true.
 {
     ::// var0 p : mapping _ _ := dict->toSlice()->loadR(mapping uint32 TvmCell); _ |.
-    ::// p[uint32!({index})] := TvmCell({value}).
-    ::// var0 dict' : TvmBuilder; _ |.
-    ::// dict'->store (p) ; _ |.
-    ::// ret := dict'->toCell().
+    ::// p[uint32!({index})] := {value}->toCell().
+    ::// var0 dict1' : TvmBuilder; _ |.
+    ::// dict1'->store (p) ; _ |.
+    ::// ret := dict1'->toCell().
     refine __return__.
 }
 return.
@@ -503,8 +503,10 @@ return .
 Defined.
 Sync.
 
+#[returns=ret]
 Ursus Definition isEmpty(s:option(TvmSlice ** TvmCell)):UExpression bool false.
 {
+    ::// ret := ! s->hasValue().
     refine __return__.
 }
 return.
@@ -851,7 +853,7 @@ Ursus Definition save_coins (src:TvmSlice) (s:TvmSlice): UExpression PhantomType
     (* staking~udict_set_builder(32, round_since, begin_cell().store_coins(coins)); *)
     ::// var0 r:TvmBuilder;_|.
     ::// r -> store (coins) .
-    ::// udict_set_builder( staking , {32%Z} , round_since, r ) .
+    ::// staking := udict_set_builder( staking , {32%Z} , round_since, r ) .
 
     refine __return__.
 }
@@ -1030,7 +1032,7 @@ Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType
    (*  int amount = s~load_coins(); *)
     ::// var0 amount:_:=s -> load(int256);_|.
     (* int coins = s~load_coins(); *)
-    ::// var0 coins:_:=s -> load(uint256);_|.
+    ::// var0 coins:_:=s -> load(int256);_|.
     (* s~load_msg_addr(); ;; skip owner address *) 
     ::// load_msg_addr(s);_|.
 
@@ -1046,19 +1048,21 @@ Ursus Definition tokens_minted(src:TvmSlice)(s:TvmSlice):UExpression PhantomType
     ::// if(round_since != {0%Z} ) then { ->/> }. (* TODO  == {0} *)
     {
        (*  ( slice v, _ ) = ~udict_delete_get?(32, round_since); *)
-       ::// var0 ( __ : _, v:TvmSlice , ___: _) := udict_delete_get(staking,{32%Z},round_since); _ |.
+       ::// var0 ( dict : TvmCell, v:TvmSlice , ___: _) := udict_delete_get(staking,{32%Z},round_since); _ |.
+       ::// staking := dict.
        (*  int staking_coins = v~load_coins(); *)
-       ::// var0 staking_coins: _ := v  -> loadR(uint256); _ | .
+       ::// var0 staking_coins: _ := v  -> loadR(int256); _ | .
         (* v.end_parse(); 
              staking_coins -= coins;*)
         ::// staking_coins -= coins.
         (*   if staking_coins { *)
-        ::// if( staking_coins != {0} ) then { ->/> } | . (* TODO  == {0} *)
+        ::// if( staking_coins != {0%Z} ) then { ->/> } | . (* TODO  == {0} *)
         {
            ::// var0 r:TvmBuilder;_|.
            ::// r -> store (staking_coins) .
             (* staking~udict_set_builder(32, round_since, begin_cell().store_coins(staking_coins)); *)
-           ::// udict_set_builder( staking , {32%Z} , round_since, r ) | .
+           ::// var0 st_dict: TvmCell := udict_set_builder( staking , {32%Z} , round_since, {r} ); _ |.
+           ::// staking := st_dict |.
         }
     }
 
@@ -1088,7 +1092,7 @@ Sync.
 Ursus Definition unstake_tokens (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
 {
     (* int query_id = s~load_uint(64); *)
-    ::// var0 query_id:_:=s -> load(int64);_|. 
+    ::// var0 query_id:_ := int256(s -> load(uint64));_|.
     (* int amount = s~load_coins(); *)
     ::// var0 amount:_:=s -> load(int256);_|.
 
@@ -1238,28 +1242,6 @@ Ursus Definition tokens_burned (src:TvmSlice) (s:TvmSlice): UExpression PhantomT
     ::// notification -> store (coins) .
     (*   send_msg(false, owner.to_builder(), null(), notification, coins, send::unreserved_balance + send::ignore_errors); *)
     ::// send_msg({false}, to_builder(owner), nullB(), notification, coins, send_unreserved_balance + send_ignore_errors). 
-refine __return__.
-}
-return .
-Defined.
-Sync.
-
-#[write = s]
-Ursus Definition tokens_burned_simplified (src:TvmSlice) (s:TvmSlice): UExpression PhantomType true.
-{
-    (* int query_id = s~load_uint(64); *)
-    ::// var0 query_id:_ := s -> load(int64);_| .
-    (* int amount = s~load_coins(); *)
-    ::// var0 amount:_ := s -> load(int256);_ | .
-    (* int coins = s~load_coins(); *)
-    ::// var0 coins:_ := s -> load(int256);_ | .
-    (* s.end_parse(); *)
-
-    (* ::// require_ (equal_TvmSlicebits(src, parent) , err_access_denied );_| . *)
-    :://throw_unless(err_access_denied, equal_TvmSlicebits(src, parent)).
-    (*   unstaking -= amount; *)
-    ::// unstaking -= amount .
- 
 refine __return__.
 }
 return .
