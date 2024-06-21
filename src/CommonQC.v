@@ -42,7 +42,7 @@ Open Scope monad_scope.
 Require Import UrsusQC.CommonQCEnvironment.
 Require Import UrsusQC.VMStateGenerator.
 
-Extract Constant defNumTests => "10".
+Extract Constant defNumTests => "100".
 
 #[global]
 Instance IDefault_booleq : XBoolEquable bool IDefault := {
@@ -160,12 +160,12 @@ Definition with_bool
     (l : LedgerLRecord rec) : G (LedgerLRecord rec) :=
         ret (l <-- false with et).
 
-Definition cell_uint256_gen_sized (size : nat) : G (TvmCell) :=
-    v <- (arbitrarySized size : G uint256) ;;
+Definition cell_int256_gen_sized (size : nat) : G (TvmCell) :=
+    v <- (arbitrarySized size : G int256) ;;
     ret (pack_cell (store_builder_ v)). 
 
 Definition mapping_uint32_cell_gen_sized (size : nat) : G (mapping uint32 TvmCell) :=
-    non_empty_map_gen (cell_uint256_gen_sized size) size.
+    non_empty_map_gen (cell_int256_gen_sized size) size.
 
 Definition with_staking (size : nat) (l : LedgerLRecord rec) : G (LedgerLRecord rec) :=
     m <- mapping_uint32_cell_gen_sized size ;;
@@ -178,8 +178,6 @@ Definition ledger_gen_sized (size : nat) : G (LedgerLRecord rec) :=
         >>= with_slice_address_sized Parent size
         >>= with_slice_address_sized Owner size
         >>= with_staking size.
-
-Sample (with_staking 0 default).
 
 #[global]
 Instance Ledger_GenSized : GenSized (LedgerLRecord rec) := {
