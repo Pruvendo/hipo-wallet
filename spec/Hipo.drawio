@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-05-29T00:01:17.745Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="F0cZZfu5XXedLP3F3nBx" version="24.4.0" type="device">
+<mxfile host="Electron" modified="2024-06-25T22:40:50.270Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.5.3 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="wSPJtwWVEDvZO4iuqo47" version="24.5.3" type="device">
   <diagram name="Page-1" id="vYP6Qsh6CQKszZ2pHyyj">
     <mxGraphModel dx="994" dy="731" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
@@ -22,8 +22,8 @@
             <mxGeometry x="593" y="300" width="120" height="60" as="geometry" />
           </mxCell>
         </UserObject>
-        <UserObject label="Low-level specification" link="https://docs.google.com/document/d/1hpVHIftDGyMAbM5UoGmohvlTraYRxaMAGoeopG_QI3w/edit?usp=sharing" id="33Dx88ZggBpf51Waryt8-1">
-          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+        <UserObject label="Low-level specification" link="https://docs.google.com/document/d/1bUGfr00Z6TGwtjw3vS_pzGMIvD9-me66Cc5Rp46FrdE/edit?usp=sharing" id="33Dx88ZggBpf51Waryt8-1">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
             <mxGeometry x="383" y="440" width="120" height="60" as="geometry" />
           </mxCell>
         </UserObject>
