@@ -1,0 +1,5 @@
+(coq.theory
+ (name HipoWallet)
+ (package ton-hipo-wallet) 
+)
+(include_subdirs qualified)
